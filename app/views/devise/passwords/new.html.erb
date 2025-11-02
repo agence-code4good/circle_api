@@ -1,0 +1,32 @@
+<%= content_for :meta_title, "Mihivai - Mot de passe oublié" %>
+<%= content_for :navbar_classes, "d-none" %>
+<%= content_for :footer_classes, "d-none" %>
+
+<div class="container d-flex flex-column align-items-center my-8 font-size-16px">
+  <div class="mb-4">
+    <%= link_to root_path, class: 'text-decoration-none' do %>
+      <%= image_tag "logo.png" %>
+    <% end %>
+  </div>
+  <h2 class="font-size-32px text-grey-dark mb-5">Mot de passe oublié</h2>
+  <%= simple_form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: 'col-8 col-md-6' }) do |f| %>
+  <%= f.error_notification %>
+    <div class="form-inputs d-flex flex-column gap-2">
+      <%= f.input :email,
+                  label: 'Email',
+                  required: false,
+                  label_html: { class: 'text-grey-blue' },
+                  autofocus: true,
+                  input_html: { autocomplete: "email", class: 'text-grey', placeholder: 'Mon email' } %>
+    </div>
+
+    <div class="form-actions mt-4">
+      <%= f.button :submit, "Envoyer les instructions", class: 'fw-bolder text-white w-100 btn btn-green' %>
+    </div>
+
+    <div class="text-grey mt-5 text-center">
+      Vous avez déjà un compte ? <span class="text-green fw-bolder"><%= link_to 'Se connecter', new_session_path(resource_name), class: "text-decoration-none text-green" %> </span>
+    </div>
+  <% end %>
+
+</div>

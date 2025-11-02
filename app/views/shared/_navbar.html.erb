@@ -1,0 +1,26 @@
+<div class="<%= yield(:navbar_classes)%>">
+  <div class="navbar">
+    <%= link_to root_path, class: 'navbar-brand' do %>
+      <%= image_tag "logo.png" %><span class="title d-none d-md-block">Mihivai</span>
+    <% end %>
+
+    <div class='d-flex align-items-center gap-3'>
+      <div class="nav-item dropdown">
+        <div class='avatar cursor-pointer d-none d-md-flex justify-content-center align-items-center' id="navbarDropdown" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+          <%= svg_tag('pictos/avatar') %>
+        </div>
+
+        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+          <% if user_signed_in? %>
+            <%= link_to 'Se déconnecter', destroy_user_session_path, class: 'dropdown-item', data: { turbo_method: :delete } %>
+          <% else %>
+            <%= link_to 'Se connecter', new_user_session_path, class: 'dropdown-item'  %>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height: 70px;"></div>
+</div>

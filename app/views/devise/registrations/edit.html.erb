@@ -1,0 +1,50 @@
+<%= content_for :meta_title, "Mihivai - Créer un compte" %>
+
+<div class="container d-flex flex-column align-items-center my-8 font-size-16px">
+  <div class="mb-4">
+    <%= link_to root_path, class: 'text-decoration-none' do %>
+      <%= image_tag "logo.png" %>
+    <% end %>
+  </div>
+  <h2 class="font-size-32px text-grey-dark mb-4">Modifier mon compte Mihivai</h2>
+  <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+    <%= f.error_notification %>
+    <div class="form-inputs d-flex flex-column gap-2">
+    <!--
+      <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+        <p>Currently waiting confirmation for: <%= resource.unconfirmed_email %></p>
+      <% end %>
+      -->
+      <%= f.input :email,
+                  label: 'Email',
+                  required: false,
+                  label_html: { class: 'text-grey-blue' },
+                  autofocus: true,
+                  input_html: { autocomplete: "email", class: 'text-grey' } %>
+      <%= f.input :password,
+                  hint: "Laissez-le vide si vous ne souhaitez pas le modifier",
+                  label: 'Mot de passe',
+                  placeholder: '••••••••',
+                  required: false,
+                  label_html: { class: 'text-grey-blue' },
+                  input_html: { autocomplete: "current-password", class: "text-grey" } %>
+      <%= f.input :password_confirmation,
+                required: false,
+                label: 'Confirmer la modification du mot de passe',
+                placeholder: '••••••••',
+                label_html: { class: 'text-grey-blue' },
+                input_html: { autocomplete: "new-password", class: "text-grey" } %>
+    <%= f.input :current_password,
+                label: 'Confirmer le mot de passe actuel',
+                placeholder: '••••••••',
+                hint: "Nécessaire pour confirmer vos changements",
+                required: true,
+                label_html: { class: 'text-grey-blue' },
+                input_html: { autocomplete: "current-password", class: "text-grey" } %>
+    </div>
+
+    <div class="form-actions mt-2">
+      <%= f.button :submit, "Sauvegarder", class: 'fw-bolder text-white w-100 btn btn-green' %>
+    </div>
+  <% end %>
+</div>

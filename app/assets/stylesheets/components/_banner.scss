@@ -1,0 +1,30 @@
+.banner-sign-in {
+  justify-content: flex-end;
+  text-align: end;
+  color: $white;
+  line-height: 110%;
+
+  h1 {
+    font-weight: 500;
+  }
+
+  p {
+    font-weight: 600;
+  }
+
+  @media(min-width:992px) {
+    padding: 52px;
+
+    h1 {
+      font-size: 56px;
+    }
+  }
+
+  @media(min-width:1200px) {
+    padding: 64px;
+
+    h1 {
+      font-size: 60px;
+    }
+  }
+}

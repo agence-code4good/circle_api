@@ -1,0 +1,66 @@
+$fonts: 14px 16px 18px 20px 24px 30px 32px 36px 48px;
+
+@each $font in $fonts {
+  .font-size-#{$font} {
+    font-size: $font !important;
+  }
+
+  @media(min-width:768px) {
+    .font-size-md-#{$font} {
+      font-size: $font !important;
+    }
+  }
+
+  @media(min-width:992px) {
+    .font-size-lg-#{$font} {
+      font-size: $font !important;
+    }
+  }
+
+  @media(min-width:1200px) {
+    .font-size-xl-#{$font} {
+      font-size: $font !important;
+    }
+  }
+
+  @media(min-width:1400px) {
+    .font-size-xxl-#{$font} {
+      font-size: $font !important;
+    }
+  }
+
+}
+
+
+$weights: 400 500 600;
+
+@each $weight in $weights {
+  .fw-#{$weight} {
+    font-weight: $weight !important;
+  }
+
+  @media(min-width:768px) {
+    .fw-md-#{$weight} {
+      font-weight: $weight !important;
+    }
+  }
+
+  @media(min-width:992px) {
+    .fw-lg-#{$weight} {
+      font-weight: $weight !important;
+    }
+  }
+
+  @media(min-width:1200px) {
+    .fw-xl-#{$weight} {
+      font-weight: $weight !important;
+    }
+  }
+
+  @media(min-width:1400px) {
+    .fw-xxl-#{$weight} {
+      font-weight: $weight !important;
+    }
+  }
+
+}

@@ -1,0 +1,30 @@
+// General style
+
+
+$theme-colors: (
+  "grey-blue": $grey-blue,
+  "grey": $grey,
+  "green": $green,
+  "notice": $notice,
+  "danger": $danger
+);
+
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: $spacer * .25,
+  2: $spacer * .5,
+  '075': $spacer * .75,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 2,
+  6: $spacer * 2.5,
+  7: $spacer * 3,
+  8: $spacer * 4,
+  9: $spacer * 5,
+  10: $spacer * 6,
+  // 11: $spacer * 7,
+  12: $spacer * 8,
+  13: $spacer * 9,
+  14: $spacer * 10
+);

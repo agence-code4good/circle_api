@@ -1,0 +1,50 @@
+$sizes: 16px 20px 24px 40px 80px 100px 125px 75vh auto;
+
+@each $size in $sizes {
+  .height-#{$size} {
+    height: $size !important;
+  }
+
+  .width-#{$size} {
+    width: $size !important;
+  }
+
+  .max-height-#{$size} {
+    max-height: $size !important;
+  }
+
+  .max-width-#{$size} {
+    max-width: $size !important;
+  }
+
+  .min-height-#{$size} {
+    min-height: $size !important;
+  }
+
+  .min-width-#{$size} {
+    min-width: $size !important;
+  }
+
+  @media(min-width:768px) {
+    .width-md-#{$size} {
+      width: $size !important;
+    }
+  }
+}
+
+.page-min-height {
+  min-height: calc(100vh - 70px);
+}
+
+.mw-58 {
+  max-width: 58%;
+}
+
+.py-50px {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.mb-2pc {
+  margin-bottom: 2pc !important;
+}
