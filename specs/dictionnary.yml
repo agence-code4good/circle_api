@@ -1,0 +1,828 @@
+C0:
+  label: "version"
+  type: "integer"
+  required: true
+C1:
+  label: "case"
+  type: "string"
+  enum:
+    "00": "ND"
+    "A0": "d'Origine"
+    "A1": "d'Origine, avec millésime au pochoir"
+    "A2": "Neutre"
+    "A3": "Reconditionnée hors Propriété"
+  required: false
+C2:
+  label: "packing_size"
+  type: "integer"
+  enum:
+    "0": "ND"
+    "1": "1"
+    "2": "2"
+    "3": "3"
+    "4": "4"
+    "5": "5"
+    "6": "6"
+    "7": "7"
+    "8": "8"
+    "9": "9"
+    "10": "10"
+    "11": "11"
+    "12": "12"
+    "13": "13"
+    "14": "14"
+    "15": "15"
+    "16": "16"
+    "17": "17"
+    "18": "18"
+    "19": "19"
+    "20": "20"
+    "21": "21"
+    "22": "22"
+    "23": "23"
+    "24": "24"
+  required: true
+C3:
+  label: "case_characteristic"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Classique"
+    "A1": "à Plat"
+    "A2": "(2x3)"
+    "A3": "à Plat à Glissière"
+    "A4": "(2x3) à Glissière"
+    "A5": "A Glissière"
+    "A6": "Variation"
+    "A7": "Coffret spécial"
+  required: true
+C4:
+  label: "case_origin"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "d'Origine"
+    "A1": "d'Origine, avec millésime au pochoir"
+    "A2": "Neutre"
+    "A3": "Reconditionnée hors Propriété"
+  required: true
+C5:
+  label: "case_packaging"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Avec suremballage carton"
+    "A1": "Avec suremballage plastique"
+    "A2": "Bande de garantie Propriété"
+    "A3": "Bande de garantie Autre"
+    "A4": "Avec papier(s) de soie avec marquage"
+    "A5": "Avec papier(s) de soie sans marquage"
+    "A6": "Avec intérieur carton"
+    "A7": "Cerclage 2 x CB6"
+    "A8": "Cerclage 2 x CT6"
+    "A9": "Présence d'un coffret carton unitaire par format"
+    "B0": "Etui de laine unitaire par format"
+  required: true
+C6:
+  label: "case_weight"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C7:
+  label: "case_length"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C8:
+  label: "case_width"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C9:
+  label: "case_height"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C10:
+  label: "product"
+  type: "string"
+  required: true
+C11:
+  label: "vintage"
+  type: "string"
+  enum:
+    "A1": "Sans millésime"
+  required: true
+C12:
+  label: "degree"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C13:
+  label: "bottle_size"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "0,05 L"
+    "A1": "0,25 L"
+    "A2": "0,33 L"
+    "A3": "0,36 L"
+    "A4": "0,50 L"
+    "A5": "0,70 L"
+    "A6": "0,73 L"
+    "A7": "0,75 L"
+    "A8": "0,36 L"
+    "A9": "0,375 L"
+    "B0": "1,48 L"
+    "B1": "1,50 L"
+    "B2": "2,25 L"
+    "B3": "2,96 L"
+    "B4": "3,0 L"
+    "B5": "4,44 L"
+    "B6": "4,5 L"
+    "B7": "5,0 L"
+    "B8": "5,92 L"
+    "B9": "6,0 L"
+    "C0": "9,0 L"
+    "C1": "12,0 L"
+    "C2": "15,0 L"
+    "C3": "18,0 L"
+    "C4": "27,0 L"
+    "C5": "100,0 L"
+    "C6": "225,0 L"
+    "C7": "900,0 L"
+  required: true
+C14:
+  label: "traffic_right"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "CRD"
+    "A1": "CRD linéaire"
+    "A2": "Acquit"
+    "A3": "Acquit, droits payés"
+  required: true
+C15:
+  label: "empty_bottle_weight"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C16:
+  label: "full_bottle_weight"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C17:
+  label: "bottle_height"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C18:
+  label: "bottle_diameter"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C19:
+  label: "neck_bottle_diameter"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C20:
+  label: "logo_packaging"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Sans Logo Femme enceinte"
+    "A1": "Présence Logo Femme enceinte"
+    "A2": "Présence Phrase sanitaire"
+    "A3": "Présence Triman Format"
+    "A4": "Présence Triman Caisse"
+    "A5": "Présence Info-Tri Format"
+    "A6": "Présence Info-Tri Caisse"
+    "A7": "Présence Logo Albumine"
+    "A8": "Présence Pregnancy Warning"
+    "A9": "Présence RED Pregnancy Warning"
+    "B0": "Présence Eurofeuille"
+    "B1": "Présence Eurofeuille détachable"
+  required: true
+C21:
+  label: "bottle_packaging"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Habillage classique"
+    "A1": "Habillage spécial"
+    "A2": "Tiré-Bouché"
+    "A3": "Verre vert"
+    "A4": "Verre Blanc"
+    "A5": "Verre fumé"
+  required: true
+C22:
+  label: "label_lenght"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C23:
+  label: "label_width"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C24:
+  label: "back_label_lenght"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C25:
+  label: "back_label_width"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C26:
+  label: "reward_type"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Médaille d'Or"
+    "A1": "Médaille d'Argent"
+    "A2": "Médaille de Bronze"
+    "A3": "Double Médaille d'Or"
+    "A4": "Médaille de Platine"
+    "A5": "Macaron"
+    "A6": "Colerette"
+    "A7": "Cône"
+    "A8": "Une Etoile"
+    "A9": "Deux Etoiles"
+    "B0": "Trois Etoiles"
+  required: true
+C27:
+  label: "competition"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "70 Millions de Dégustateurs"
+    "A1": "Bettane & Desseauve"
+    "A2": "Blaye"
+    "A3": "Bordeaux"
+    "A4": "Bruxelle"
+    "A5": "Challenge Millésime Bio"
+    "A6": "CWSA"
+    "A7": "Decanter"
+    "A8": "Feminalise"
+    "A9": "Frankfurt"
+    "B0": "Gilbert et Gaillard"
+    "B1": "Guide Hachette"
+    "B2": "IWC"
+    "B3": "IWSC"
+    "B4": "Lyon"
+    "B5": "Macon"
+    "B6": "Mondu Vini"
+    "B7": "Paris"
+    "B8": "Terre de Vins"
+    "B9": "Vert de Vin"
+    "C0": "Vinalies"
+    "C1": "Wine Challenge Tokyo"
+    "C2": "Wine Expo Poland"
+  required: true
+C28:
+  label: "competition_year"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C29:
+  label: "bottle_packaging_reward"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Pas de récompense"
+    "A1": "Première récompence enregistrée"
+    "A2": "Deuxième récompense enregistrée"
+    "A3": "Troisième récompense enregistrée"
+    "A4": "Quatrième récompense enregistrée"
+    "A5": "Cinquième récompense enregistrée"
+    "A6": "Sixième récompense enregistrée"
+    "A7": "Septième récompense enregistrée"
+    "A8": "Huitième récompense enregistrée"
+    "A9": "Neuvième récompense enregistrée"
+    "B0": "Dixième récompense enregistrée"
+  required: true
+C30:
+  label: "capping"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Bouchon liège"
+    "A1": "Bouchon technique"
+    "A2": "Bouchon en plastique"
+    "A3": "Bouchon en verre"
+    "A4": "Capsule à vis"
+    "A5": "Bouchon liège avec plaque de muselet"
+    "A6": "Bouchon technique avec plaque de muselet"
+    "A7": "Bouchon plastique avec plaque de muselet"
+    "A8": "Bouchon à Caspsule"
+  required: true
+C31:
+  label: "volume"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C32A:
+  label: "batch_number"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C33B:
+  label: "traceability_number"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C34:
+  label: "harvest_date"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C35:
+  label: "bottling_date"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C36:
+  label: "bottle_barcode_origin"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Pas de gencod col"
+    "A1": "Présence d'un EAN13 col Propriété"
+    "A2": "Présence d'un EAN13 col Autre"
+    "A3": "Présence d'un UPC12 col Propriété"
+    "A4": "Présence d'un UPC12 col Autre"
+  required: true
+C37C:
+  label: "bottle_barcode_number"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C38:
+  label: "case_barcode_origin"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Pas de gencod caisse"
+    "A1": "Présence d'un EAN13 caisse Propriété"
+    "A2": "Présence d'un EAN13 caisse Autre"
+    "A3": "Présence d'un SCC14 caisse Propriété"
+    "A4": "Présence d'un SCC14 caisse Autre"
+  required: true
+C39D:
+  label: "case_barcode_number"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C40:
+  label: "vintage_certification_organism"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Pas d'organisme"
+    "A1": "Agrocert"
+    "A2": "Certipaq"
+    "A3": "Certisud"
+    "A4": "Demeter"
+    "A5": "Ecocert"
+    "A6": "Qualisud"
+    "A7": "Qualité-France"
+    "A8": "Bureau Veritas"
+    "A9": "Biodyvin"
+    "B0": "Certis"
+    "B1": "Bureau Alpes Controles"
+    "B2": "Control Union Inspections France"
+    "B3": "Ocacia"
+    "B4": "Afnor"
+    "B5": "Association Végétarienne de France"
+    "B6": "NOP"
+    "B7": "SGS ICS"
+    "B8": "AVPI"
+    "B9": "CKCert et SCRL"
+    "C0": "Languedoc Roussillon Origines"
+    "C1": "QB Verification"
+    "C2": "Socofret"
+    "C3": "Terrae"
+    "C4": "BCKE"
+  required: true
+C41:
+  label: "vintage_agriculture"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Sans certification"
+    "A1": "En conversion, première année"
+    "A2": "En conversion, deuxième année"
+    "A3": "En conversion, troisième année"
+    "A4": "Agriculture biologique AB"
+    "A5": "Eurofeuille"
+    "A6": "Demeter"
+    "A7": "Biodyvin"
+    "A8": "Terra Vitis"
+    "A9": "Nature et Progrès"
+    "B0": "V-Label"
+    "B1": "EVE Vegan"
+    "B2": "Vegan Trademark"
+    "B3": "Kosher Label"
+    "B4": "USDA"
+    "B5": "Bio Cohérence"
+    "B6": "Agriconfiance"
+    "B7": "Zéro résidu de pesticides"
+    "B8": "Vin Méthode Nature"
+    "B9": "Certification environnementale de niveau 1"
+    "C0": "Certification environnementale de niveau 2"
+    "C1": "Haute Valeur Environnementale (HVE-V3)"
+    "C2": "Haute Valeur Environnementale (HVE-V4)"
+    "C3": "Haute Valeur Environnementale (HVE-V5)"
+    "C4": "Bee Friendly"
+    "C5": "BRC"
+    "C6": "IFS"
+    "C7": "Vins S.A.I.N.S."
+    "C8": "AREA"
+    "C9": "AVN"
+    "D0": "Vigneron indépendant"
+    "D1": "Gluten Free"
+  required: true
+C42:
+  label: "date_certificate"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C43:
+  label: "packaging_certification"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Non"
+    "A1": "Première certification enregistrée"
+    "A2": "Deuxième certification enregistrée"
+    "A3": "Troisième certification enregistrée"
+    "A4": "Quatrième certification enregistrée"
+  required: true
+C44:
+  label: "estate_certification_organism"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Sans certification"
+    "A1": "COFRAC"
+    "A2": "DEKRA"
+    "A3": "Afnor"
+    "A4": "Apave"
+    "A5": "Bureau Veritas"
+    "A6": "CONTROL UNION INSPECTIONS France"
+    "A7": "ECOCERT ENVIRONNEMENT"
+    "A8": "SGS ICS"
+    "A9": "Atout France"
+  required: true
+C45:
+  label: "estate_certificate"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Sans certification"
+    "A1": "ISO 9001"
+    "A2": "ISO 14001"
+    "A3": "ISO 50001"
+    "A4": "Engagé RSE"
+    "A5": "ISO 20121"
+    "A6": "B Corp"
+    "A7": "Bordeaux Cultivons Demain"
+    "A8": "SME"
+    "A9": "Vignerons engagés"
+    "B0": "Vignobles & Découvertes"
+  required: true
+C46:
+  label: "date_estate_certificate"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C47:
+  label: "packaging_estate_certification"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Non"
+    "A1": "Première certification propriété enregistrée"
+    "A2": "Deuxième certification propriété enregistrée"
+    "A3": "Troisième certification propriété enregistrée"
+  required: true
+C48:
+  label: "sulphite"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Présence 10 mg et plus"
+    "A1": "Sans sulfites ajoutés"
+  required: true
+C49:
+  label: "sulphites_language"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Allemand"
+    "A1": "Anglais"
+    "A2": "Arabe"
+    "A3": "Chinois"
+    "A4": "Coréen"
+    "A5": "Danois"
+    "A6": "Espagnol"
+    "A7": "Finlandais"
+    "A8": "Français"
+    "A9": "Grec"
+    "B0": "Italien"
+    "B1": "Japonais"
+    "B2": "Lituanien"
+    "B3": "Néerlandais"
+    "B8": "Russe"
+    "B9": "Suédois"
+    "C0": "Tchèque"
+    "C1": "Ukrainien"
+    "C2": "Vietnamien"
+  required: true
+C50:
+  label: "back_label_language"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Pas de contre-étiquette"
+    "A1": "Allemand"
+    "A2": "Anglais"
+    "A3": "Arabe"
+    "A4": "Chinois"
+    "A5": "Coréen"
+    "A6": "Danois"
+    "A7": "Espagnol"
+    "A8": "Finlandais"
+    "A9": "Français"
+    "B0": "Grec"
+    "B1": "Italien"
+    "B2": "Japonais"
+    "B3": "Lituanien"
+    "B4": "Néerlandais"
+    "B5": "Norvégien"
+    "B6": "Polonais"
+    "B7": "Portuguais"
+    "B8": "Roumain"
+    "B9": "Russe"
+    "C0": "Suédois"
+    "C1": "Tchèque"
+    "C2": "Ukrainien"
+    "C3": "Vietnamien"
+  required: true
+C51:
+  label: "pass_presence"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Non"
+    "A1": "Présence d'un pass export"
+  required: true
+C52E:
+  label: "specific_back_label_BAT"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C53F:
+  label: "technical_sheet_url"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C54G:
+  label: "export_analysis_url"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C55H:
+  label: "certificate_url"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C56I:
+  label: "photos_url"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C57J:
+  label: "packaging_visual_url"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C58K:
+  label: "certificate_origin_url"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C59:
+  label: "pallet_type"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "DEMI"
+    "A1": "EUROPE"
+    "A2": "EUROPE NIMP15"
+    "A3": "VMF"
+    "A4": "VMF NIMP15"
+    "A5": "CHEP"
+  required: true
+C60:
+  label: "pallet_volume"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C61:
+  label: "pallet_weight"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C62:
+  label: "pallet_height"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C63L:
+  label: "fda"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C64M:
+  label: "gacc"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C65N:
+  label: "ttb"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C66:
+  label: "in_bond"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "NON"
+    "A1": "OUI"
+  required: true
+C67O:
+  label: "list_of_ingredient"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C68:
+  label: "energetic_value_kj"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C69:
+  label: "energetic_value_kcal"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C70:
+  label: "fat"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C71:
+  label: "protein"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C72:
+  label: "salt"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C73:
+  label: "carbohydrate"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C74:
+  label: "sugar"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C75:
+  label: "saturated_fatty_acid"
+  type: "integer"
+  enum:
+    "0": "ND"
+  required: true
+C76:
+  label: "qr_code_nutri_info"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "Absence des informations nutritionnelles"
+    "A1": "Présence du Tableau des informations nutritionnelles"
+    "A2": "Présence du QR Code des informations nutritionnelles"
+  required: true
+C77P:
+  label: "qr_code_url"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: false
+C78:
+  label: "bottle_size_available"
+  type: "string"
+  enum:
+    "0": "ND"
+    "A0": "0,05 L"
+    "A1": "0,25 L"
+    "A2": "0,33 L"
+    "A3": "0,36 L"
+    "A4": "0,50 L"
+    "A5": "0,70 L"
+    "A6": "0,73 L"
+    "A7": "0,75 L"
+    "A8": "0,36 L"
+    "A9": "0,375 L"
+    "B0": "1,48 L"
+    B1": "1,50 L"
+    "B2": "2,25 L"
+    "B3": "2,96 L"
+    "B4": "3,0 L"
+    "B5": "4,44 L"
+    "B6": "4,5 L"
+    "B7": "5,0 L"
+    "B8": "5,92 L"
+    "B9": "6,0 L"
+    "B2": "2,25 L"
+    "B3": "2,96 L"
+    "B4": "3,0 L"
+    "B5": "4,44 L"
+    "B6": "4,5 L"
+    "B7": "5,0 L"
+    "B8": "5,92 L"
+    "B9": "6,0 L"
+    "C0": "9,0 L"
+    "C1": "12,0 L"
+    "C2": "15,0 L"
+    "C3": "18,0 L"
+    "C4": "27,0 L"
+    "C5": "100,0 L"
+    "C6": "225,0 L"
+    "C7": "900,0 L"
+  required: true
+C79:
+  label: "case_available"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: true
+C80:
+  label: "case_by_default"
+  type: "string"
+  enum:
+    "0": "ND"
+  required: true
