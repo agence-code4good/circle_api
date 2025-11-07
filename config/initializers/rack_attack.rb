@@ -1,5 +1,4 @@
 class Rack::Attack
-
   ### Configure Cache ###
 
   # If you don't want to use Rails.cache (Rack::Attack's default), then
@@ -24,7 +23,7 @@ class Rack::Attack
   # Throttle all requests by IP (60rpm)
   #
   # Key: "rack::attack:#{Time.now.to_i/:period}:req/ip:#{req.ip}"
-  throttle('req/ip', limit: 1000, period: 5.minutes) do |req|
+  throttle("req/ip", limit: 60, period: 1.minutes) do |req|
     req.ip # unless req.path.start_with?('/assets')
   end
 
@@ -40,8 +39,8 @@ class Rack::Attack
   # Throttle POST requests to /login by IP address
   #
   # Key: "rack::attack:#{Time.now.to_i/:period}:logins/ip:#{req.ip}"
-  throttle('logins/ip', limit: 5, period: 20.seconds) do |req|
-    urls = ['/login', '/admin/login', "/users/sign_in"]
+  throttle("logins/ip", limit: 5, period: 20.seconds) do |req|
+    urls = [ "/login", "/admin/login", "/users/sign_in" ]
     if urls.include?(req.path) && req.post?
       req.ip
     end
@@ -54,12 +53,12 @@ class Rack::Attack
   # throttle logins for another user and force their login requests to be
   # denied, but that's not very common and shouldn't happen to you. (Knock
   # on wood!)
-  throttle('logins/email', limit: 5, period: 20.seconds) do |req|
-    urls = ['/login', '/admin/login', "/users/sign_in"]
+  throttle("logins/email", limit: 5, period: 20.seconds) do |req|
+    urls = [ "/login", "/admin/login", "/users/sign_in" ]
     if urls.include?(req.path) && req.post?
       # Normalize the email, using the same logic as your authentication process, to
       # protect against rate limit bypasses. Return the normalized email if present, nil otherwise.
-      req.params['email'].to_s.downcase.gsub(/\s+/, "").presence
+      req.params["email"].to_s.downcase.gsub(/\s+/, "").presence
     end
   end
 

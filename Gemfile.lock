@@ -195,6 +195,9 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.15.2)
+    json-schema (6.0.0)
+      addressable (~> 2.8)
+      bigdecimal (~> 3.1)
     kamal (2.8.2)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -302,6 +305,9 @@ GEM
     rack (3.2.4)
     rack-attack (6.8.0)
       rack (>= 1.0, < 4)
+    rack-cors (3.0.0)
+      logger
+      rack (>= 3.0.14)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -358,6 +364,20 @@ GEM
       actionpack (>= 7.0)
       railties (>= 7.0)
     rexml (3.4.4)
+    rspec-core (3.13.6)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.6)
+    rswag-api (2.17.0)
+      activesupport (>= 5.2, < 8.2)
+      railties (>= 5.2, < 8.2)
+    rswag-specs (2.17.0)
+      activesupport (>= 5.2, < 8.2)
+      json-schema (>= 2.2, < 7.0)
+      railties (>= 5.2, < 8.2)
+      rspec-core (>= 2.14)
+    rswag-ui (2.17.0)
+      actionpack (>= 5.2, < 8.2)
+      railties (>= 5.2, < 8.2)
     rubocop (1.81.7)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -476,6 +496,7 @@ PLATFORMS
 
 DEPENDENCIES
   activeadmin (~> 3.3)
+  bcrypt (~> 3.1.7)
   bootsnap
   brakeman
   bundler-audit
@@ -493,7 +514,11 @@ DEPENDENCIES
   puma (>= 5.0)
   pundit
   rack-attack
+  rack-cors
   rails (~> 8.1.1)
+  rswag-api
+  rswag-specs
+  rswag-ui
   rubocop-rails-omakase
   selenium-webdriver
   simple_form

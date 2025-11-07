@@ -20,7 +20,7 @@ gem "cssbundling-rails"
 gem "jbuilder"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -66,10 +66,25 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Authentication & Authorization
 gem "devise"
 gem "pundit"
-gem "draper"
-gem "simple_form"
-gem "rack-attack"
 
+# Decorators
+gem "draper"
+
+# Forms
+gem "simple_form"
+
+# Security Cors & Rate Limiting
+gem "rack-attack"
+gem "rack-cors"
+
+# Admin Panel
 gem "activeadmin", "~> 3.3"
+
+# Doc & tests API
+gem "rswag-api"
+gem "rswag-ui"
+gem "rswag-specs"
