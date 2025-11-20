@@ -1,4 +1,3 @@
-# app/policies/order_status_policy.rb
 # frozen_string_literal: true
 
 class OrderPolicy < ApplicationPolicy
@@ -16,16 +15,6 @@ class OrderPolicy < ApplicationPolicy
     bon_de_livraison
   ].freeze
 
-  ALLOWED_TRANSITIONS = {
-    "nouvelle_commande"                       => %w[en_attente_demande_de_mise],
-    "en_attente_demande_de_mise"             => %w[demande_de_mise_et_logistique_en_cours details_de_mise_et_logistique_confirmes],
-    "demande_de_mise_et_logistique_en_cours" => %w[details_de_mise_et_logistique_confirmes],
-    "details_de_mise_et_logistique_confirmes"=> %w[bon_de_commande],
-    "bon_de_commande"                         => %w[mise_a_disposition],
-    "mise_a_disposition"                      => %w[bon_de_livraison],
-    "bon_de_livraison"                        => %w[commande_cloturee]
-  }.freeze
-
   # Autorisation "générale" d'action
   def create?
     # Vérifier que le user authentifié est le buyer
@@ -36,17 +25,33 @@ class OrderPolicy < ApplicationPolicy
     true
   end
 
-  # Vérifie que la transition d'état demandée est autorisée
+  # Vérifie que le statut demandé est autorisé pour le rôle de l'utilisateur
   # to_status: String (ex: "bon_de_commande")
-  def transition?(to_status)
-    from = record&.status.presence || "nouvelle_commande"
-    allowed = ALLOWED_TRANSITIONS.fetch(from, [])
-    return false unless allowed.include?(to_status)
-
-    case actor_role_for(user, record)
+  def allowed_status?(to_status)
+    case actor_role
     when :buyer  then BUYER_ONLY.include?(to_status)
     when :seller then SELLER_ONLY.include?(to_status)
     else false
+    end
+  end
+
+  # Déduis le rôle effectif de l'acteur sur CETTE commande
+  # Implémente ici ta logique: appariement clé API ↔ paire buyer/seller, etc.
+  def actor_role
+    return nil unless user.is_a?(Partner) && record
+
+    buyer_id = record.buyer_id
+    return nil unless buyer_id
+
+    buyer_partner = buyer_partner_for(buyer_id)
+    return nil unless buyer_partner
+
+    if buyer_partner == user
+      :buyer
+    elsif record.seller_id && seller_partner_for(record.seller_id) == user
+      :seller
+    else
+      nil
     end
   end
 
@@ -59,9 +64,34 @@ class OrderPolicy < ApplicationPolicy
 
   private
 
-  # Déduis le rôle effectif de l'acteur sur CETTE commande
-  # Implémente ici ta logique: appariement clé API ↔ paire buyer/seller, etc.
-  def actor_role_for(user, order)
-    # Retrouner le rôle de l'utilisateur authentifié dans la commande (buyer ou seller)
+  # Détermine le partner buyer à partir d'un buyer_id
+  # Si buyer_id correspond à partner_alias, retourne le partner de l'identifier_pair
+  # Si buyer_id correspond à my_alias, retourne le partner Circle (main_partner)
+  def buyer_partner_for(buyer_id)
+    return nil unless buyer_id
+
+    identifier_pair = IdentifierPair.find_by(partner_alias: buyer_id) || IdentifierPair.find_by(my_alias: buyer_id)
+    return nil unless identifier_pair
+
+    if identifier_pair.partner_alias == buyer_id
+      identifier_pair.partner
+    else
+      Partner.main_partner
+    end
+  end
+
+  # Détermine le partner seller à partir d'un seller_id
+  # Même logique que pour le buyer
+  def seller_partner_for(seller_id)
+    return nil unless seller_id
+
+    identifier_pair = IdentifierPair.find_by(partner_alias: seller_id) || IdentifierPair.find_by(my_alias: seller_id)
+    return nil unless identifier_pair
+
+    if identifier_pair.partner_alias == seller_id
+      identifier_pair.partner
+    else
+      Partner.main_partner
+    end
   end
 end

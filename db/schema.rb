@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_02_184051) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_20_102924) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,42 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_02_184051) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+  create_table "identifier_pairs", force: :cascade do |t|
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.string "my_alias"
+    t.string "partner_alias"
+    t.bigint "partner_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["partner_id"], name: "index_identifier_pairs_on_partner_id"
+  end
+
+  create_table "order_lines", force: :cascade do |t|
+    t.jsonb "circle_code"
+    t.datetime "created_at", null: false
+    t.bigint "order_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_order_lines_on_order_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.string "buyer_id"
+    t.datetime "created_at", null: false
+    t.string "note"
+    t.string "order_reference"
+    t.string "seller_id"
+    t.integer "status"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "partners", force: :cascade do |t|
+    t.string "auth_token"
+    t.string "code"
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.boolean "admin"
     t.datetime "created_at", null: false
@@ -52,4 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_02_184051) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "identifier_pairs", "partners"
+  add_foreign_key "order_lines", "orders"
 end

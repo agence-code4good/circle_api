@@ -27,6 +27,9 @@
 # Ignore cursor rules
 /.cursor/*
 
+# Ignore test requests
+/requests/*
+
 /config/credentials/development.key
 
 /config/credentials/staging.key
