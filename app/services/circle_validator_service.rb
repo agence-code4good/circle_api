@@ -4,7 +4,8 @@
 class CircleValidatorService
   attr_reader :simulate_errors
 
-  def initialize(simulate_errors: false)
+  def initialize(circle_code, simulate_errors: false)
+    @circle_code = circle_code
     @simulate_errors = simulate_errors
   end
 

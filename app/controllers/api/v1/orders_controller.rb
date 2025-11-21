@@ -19,21 +19,7 @@ class Api::V1::OrdersController < Api::BaseController
       return
     end
 
-    # Vérifier la validité du ou des codes Circle
-    order_lines_attrs = order_params[:order_lines_attributes] || []
-    if order_lines_attrs.empty?
-      render json: { error: "At least one order line is required" }, status: :unprocessable_entity
-      return
-    end
-
-    order_lines_attrs.each do |order_line|
-      circle_code = order_line[:circle_code]
-      if circle_code.nil? || (circle_code.is_a?(Hash) && circle_code.empty?)
-        render json: { error: "Circle code is required for all order lines" }, status: :unprocessable_entity
-        return
-      end
-    end
-
+    # Vérifier que la order line est valide (dans les validations du model OrderLine)
     if order.save
       render json: order, status: :created
     else
@@ -66,6 +52,7 @@ class Api::V1::OrdersController < Api::BaseController
       end
     end
 
+    # Vérifier que la order line est valide et que le volume total de la commande n'a pas été modifié (dans les validations du model OrderLine & Order)
     if @order.update(order_params)
       render json: @order, status: :ok
     else
