@@ -19,6 +19,15 @@ class Api::V1::OrdersController < Api::BaseController
       return
     end
 
+    # Vérifier la validité des circle_codes de chaque order line
+    order.order_lines.each do |order_line|
+      result = CircleValidatorService.new(order_line.circle_code).validate
+      if result[:errors].any?
+        render json: { errors: result[:errors] }, status: :unprocessable_entity
+        return
+      end
+    end
+
     # Vérifier que la order line est valide (dans les validations du model OrderLine)
     if order.save
       render json: order, status: :created

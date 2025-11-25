@@ -1,27 +1,46 @@
-# app/services/validator_service.rb
-# frozen_string_literal: true
+# app/services/circle_validator_service.rb
+require "json"
 
 class CircleValidatorService
-  attr_reader :simulate_errors
+  attr_reader :circle_values, :config, :errors, :version
 
-  def initialize(circle_code, simulate_errors: false)
-    @circle_code = circle_code
-    @simulate_errors = simulate_errors
+  VALIDATION_CLASSES = {
+    "single_value"            => Validations::SingleValueValidation,
+    "forbidden_value"         => Validations::ForbiddenValueValidation,
+    "excluded_combinations"   => Validations::ExcludedCombinationsValidation,
+    "casket_value"            => Validations::CasketValueValidation,
+    "dependency"              => Validations::DependencyValidation,
+    "match_value"             => Validations::MatchValueValidation,
+    "duplicate_value"         => Validations::DuplicateValueValidation,
+    "numeric_value"           => Validations::NumericValueValidation,
+    "in_database"             => Validations::InDatabaseValidation,
+    "in_database_combination" => Validations::InDatabaseCombinationValidation,
+    "product_validation"      => Validations::ProductValidation
+  }
+
+  CONFIG_JSON = File.read(Rails.root.join("specs", "circle_validations.json"))
+
+  def initialize(circle_values, config_json = CONFIG_JSON)
+    @circle_values = circle_values
+    @config = JSON.parse(config_json)
+    @errors = {}
   end
 
-  def call
-    if simulate_errors
-      { valid: false, errors: {
-        "C4" => {
-          "invalid_value" => "Valeur incorrecte pour le champ C4",
-          "missing_field" => "Le champ C4 est obligatoire"
-        },
-        "C10" => {
-          "unknown_reference" => "Le code C10 n'existe pas dans la base produits"
-        }
-      } }
-    else
-      { valid: true, errors: {} }
+  def validate
+    @config.each do |code, settings|
+      value = @circle_values[code]
+      @circle_values[code] = "00" && value = "00" if value.nil?  # Valeur par défaut à "00" (ND) si aucune valeur n'est fournie
+      settings["validations"].each do |rule|
+        validation_class = VALIDATION_CLASSES[rule["type"]]
+        next if validation_class.nil?
+        validator = validation_class.new(code, value, rule, version, circle_values)
+        error = validator.validate
+        if error
+          @errors[code] ||= []
+          @errors[code] << error
+        end
+      end
     end
+    @errors
   end
 end

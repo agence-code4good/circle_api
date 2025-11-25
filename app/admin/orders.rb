@@ -15,11 +15,11 @@ ActiveAdmin.register Order do
 
   # Add or remove filters to toggle their visibility
   filter :id
-  filter :buyer
+  filter :buyer_id
   filter :created_at
   filter :note
   filter :order_reference
-  filter :seller
+  filter :seller_id
   filter :status
   filter :updated_at
 
@@ -27,11 +27,11 @@ ActiveAdmin.register Order do
   index do
     selectable_column
     id_column
-    column :buyer
+    column :buyer_id
     column :created_at
     column :note
     column :order_reference
-    column :seller
+    column :seller_id
     column :status
     column :updated_at
     actions
@@ -67,10 +67,10 @@ ActiveAdmin.register Order do
   form do |f|
     f.semantic_errors(*f.object.errors.attribute_names)
     f.inputs do
-      f.input :buyer
+      f.input :buyer_id
       f.input :note
       f.input :order_reference
-      f.input :seller
+      f.input :seller_id
       f.input :status
     end
     f.actions
