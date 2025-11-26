@@ -4,7 +4,8 @@ require_relative "base_validation"
 module Validations
   class InDatabaseCombinationValidation < BaseValidation
     def validate
-      return nil if @circle_values.is_a?(String) && @circle_values == "00"
+      debugger
+      return nil if value.is_a?(String) && value == "00"
 
       combination_codes = rule["combination_codes"] || []
       mode = rule["combinaison_mode"] || "combined_codes"  # Par défaut, "combined_codes"

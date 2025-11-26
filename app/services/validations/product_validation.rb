@@ -9,24 +9,18 @@ module Validations
     end
 
     def validate
-      return if @product.nil?
+      if @product.nil?
+        return "Le produit #{value} n'existe pas."
+      end
       vintage = circle_values.dig("C11")
-      return nil unless vintage
 
-      starting_vintage = @product.starting_vintage.value
-      late_vintage = @product.late_vintage.value
-
-      if @product.excluded_vintages.pluck(:value).include?(vintage) ||
-        (starting_vintage != "ND" && vintage < starting_vintage) ||
-        (late_vintage != "ND" && vintage > late_vintage) ||
-        (vintage > Date.today.year.to_s)
-       return "Le millésime #{vintage} n'existe pas pour le produit #{@product.value}."
+      unless @product.vintage_allowed?(vintage)
+       "Le millésime #{vintage} n'existe pas pour le produit #{@product.code}."
       end
     end
 
     def default_error_message(code)
       "Erreur product_validation sur #{code}."
     end
-
   end
 end

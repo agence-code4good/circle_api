@@ -1,6 +1,8 @@
 C0:
   label: "version"
   type: "integer"
+  enum:
+    "11": "11"
   required: true
 C1:
   label: "case"
@@ -16,7 +18,7 @@ C2:
   label: "packing_size"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
     "1": "1"
     "2": "2"
     "3": "3"
@@ -46,7 +48,7 @@ C3:
   label: "case_characteristic"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Classique"
     "A1": "à Plat"
     "A2": "(2x3)"
@@ -60,7 +62,7 @@ C4:
   label: "case_origin"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "d'Origine"
     "A1": "d'Origine, avec millésime au pochoir"
     "A2": "Neutre"
@@ -70,7 +72,7 @@ C5:
   label: "case_packaging"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Avec suremballage carton"
     "A1": "Avec suremballage plastique"
     "A2": "Bande de garantie Propriété"
@@ -87,25 +89,25 @@ C6:
   label: "case_weight"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C7:
   label: "case_length"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C8:
   label: "case_width"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C9:
   label: "case_height"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C10:
   label: "product"
@@ -121,13 +123,13 @@ C12:
   label: "degree"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C13:
   label: "bottle_size"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "0,05 L"
     "A1": "0,25 L"
     "A2": "0,33 L"
@@ -161,7 +163,7 @@ C14:
   label: "traffic_right"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "CRD"
     "A1": "CRD linéaire"
     "A2": "Acquit"
@@ -171,37 +173,37 @@ C15:
   label: "empty_bottle_weight"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C16:
   label: "full_bottle_weight"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C17:
   label: "bottle_height"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C18:
   label: "bottle_diameter"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C19:
   label: "neck_bottle_diameter"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C20:
   label: "logo_packaging"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Sans Logo Femme enceinte"
     "A1": "Présence Logo Femme enceinte"
     "A2": "Présence Phrase sanitaire"
@@ -219,7 +221,7 @@ C21:
   label: "bottle_packaging"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Habillage classique"
     "A1": "Habillage spécial"
     "A2": "Tiré-Bouché"
@@ -231,31 +233,31 @@ C22:
   label: "label_lenght"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C23:
   label: "label_width"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C24:
   label: "back_label_lenght"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C25:
   label: "back_label_width"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C26:
   label: "reward_type"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Médaille d'Or"
     "A1": "Médaille d'Argent"
     "A2": "Médaille de Bronze"
@@ -272,7 +274,7 @@ C27:
   label: "competition"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "70 Millions de Dégustateurs"
     "A1": "Bettane & Desseauve"
     "A2": "Blaye"
@@ -301,13 +303,13 @@ C28:
   label: "competition_year"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C29:
   label: "bottle_packaging_reward"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Pas de récompense"
     "A1": "Première récompence enregistrée"
     "A2": "Deuxième récompense enregistrée"
@@ -324,7 +326,7 @@ C30:
   label: "capping"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Bouchon liège"
     "A1": "Bouchon technique"
     "A2": "Bouchon en plastique"
@@ -339,37 +341,37 @@ C31:
   label: "volume"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C32A:
   label: "batch_number"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C33B:
   label: "traceability_number"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C34:
   label: "harvest_date"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C35:
   label: "bottling_date"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C36:
   label: "bottle_barcode_origin"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Pas de gencod col"
     "A1": "Présence d'un EAN13 col Propriété"
     "A2": "Présence d'un EAN13 col Autre"
@@ -380,13 +382,13 @@ C37C:
   label: "bottle_barcode_number"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C38:
   label: "case_barcode_origin"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Pas de gencod caisse"
     "A1": "Présence d'un EAN13 caisse Propriété"
     "A2": "Présence d'un EAN13 caisse Autre"
@@ -397,13 +399,13 @@ C39D:
   label: "case_barcode_number"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C40:
   label: "vintage_certification_organism"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Pas d'organisme"
     "A1": "Agrocert"
     "A2": "Certipaq"
@@ -434,7 +436,7 @@ C41:
   label: "vintage_agriculture"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Sans certification"
     "A1": "En conversion, première année"
     "A2": "En conversion, deuxième année"
@@ -472,13 +474,13 @@ C42:
   label: "date_certificate"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C43:
   label: "packaging_certification"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Non"
     "A1": "Première certification enregistrée"
     "A2": "Deuxième certification enregistrée"
@@ -489,7 +491,7 @@ C44:
   label: "estate_certification_organism"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Sans certification"
     "A1": "COFRAC"
     "A2": "DEKRA"
@@ -505,7 +507,7 @@ C45:
   label: "estate_certificate"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Sans certification"
     "A1": "ISO 9001"
     "A2": "ISO 14001"
@@ -522,13 +524,13 @@ C46:
   label: "date_estate_certificate"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C47:
   label: "packaging_estate_certification"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Non"
     "A1": "Première certification propriété enregistrée"
     "A2": "Deuxième certification propriété enregistrée"
@@ -538,7 +540,7 @@ C48:
   label: "sulphite"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Présence 10 mg et plus"
     "A1": "Sans sulfites ajoutés"
   required: true
@@ -546,7 +548,7 @@ C49:
   label: "sulphites_language"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Allemand"
     "A1": "Anglais"
     "A2": "Arabe"
@@ -571,7 +573,7 @@ C50:
   label: "back_label_language"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Pas de contre-étiquette"
     "A1": "Allemand"
     "A2": "Anglais"
@@ -601,7 +603,7 @@ C51:
   label: "pass_presence"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Non"
     "A1": "Présence d'un pass export"
   required: true
@@ -609,49 +611,49 @@ C52E:
   label: "specific_back_label_BAT"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C53F:
   label: "technical_sheet_url"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C54G:
   label: "export_analysis_url"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C55H:
   label: "certificate_url"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C56I:
   label: "photos_url"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C57J:
   label: "packaging_visual_url"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C58K:
   label: "certificate_origin_url"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C59:
   label: "pallet_type"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "DEMI"
     "A1": "EUROPE"
     "A2": "EUROPE NIMP15"
@@ -663,43 +665,43 @@ C60:
   label: "pallet_volume"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C61:
   label: "pallet_weight"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C62:
   label: "pallet_height"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C63L:
   label: "fda"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C64M:
   label: "gacc"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C65N:
   label: "ttb"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C66:
   label: "in_bond"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "NON"
     "A1": "OUI"
   required: true
@@ -707,61 +709,61 @@ C67O:
   label: "list_of_ingredient"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C68:
   label: "energetic_value_kj"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C69:
   label: "energetic_value_kcal"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C70:
   label: "fat"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C71:
   label: "protein"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C72:
   label: "salt"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C73:
   label: "carbohydrate"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C74:
   label: "sugar"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C75:
   label: "saturated_fatty_acid"
   type: "integer"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C76:
   label: "qr_code_nutri_info"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "Absence des informations nutritionnelles"
     "A1": "Présence du Tableau des informations nutritionnelles"
     "A2": "Présence du QR Code des informations nutritionnelles"
@@ -770,13 +772,13 @@ C77P:
   label: "qr_code_url"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: false
 C78:
   label: "bottle_size_available"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
     "A0": "0,05 L"
     "A1": "0,25 L"
     "A2": "0,33 L"
@@ -810,11 +812,11 @@ C79:
   label: "case_available"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true
 C80:
   label: "case_by_default"
   type: "string"
   enum:
-    "0": "ND"
+    "00": "ND"
   required: true

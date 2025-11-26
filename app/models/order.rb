@@ -7,6 +7,7 @@ class Order < ApplicationRecord
   validates :order_lines, length: { minimum: 1 }
   validate :total_volume_cannot_change_on_update, on: :update
   validate :order_reference_cannot_change_on_update, on: :update
+  validate :order_lines_are_valid
 
   accepts_nested_attributes_for :order_lines
 
@@ -79,6 +80,17 @@ class Order < ApplicationRecord
 
     if order_reference_changed?
       errors.add(:order_reference, "ne peut pas être modifié après la création")
+    end
+  end
+
+  def order_lines_are_valid
+    order_lines.each do |order_line|
+      next if order_line.valid?
+
+      # Si une order_line est invalide, on propage l'erreur au niveau de l'order
+      order_line.errors.full_messages.each do |message|
+        errors.add(:base, "Order line error: #{message}")
+      end
     end
   end
 end

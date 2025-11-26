@@ -9,7 +9,15 @@ class OrderLine < ApplicationRecord
   end
 
   def is_valid
-    result = CircleValidatorService.new(circle_code, simulate_errors: false).call
-    errors.add(:base, result[:errors].to_json) unless result[:valid]
+    return if circle_code.nil?
+
+    validation_errors = CircleValidatorService.new(circle_code).validate
+
+    if validation_errors.any?
+      # Ajouter les erreurs au format lisible
+      validation_errors.each do |code, errors_array|
+        errors.add(:circle_code, "#{code}: #{errors_array.join(', ')}")
+      end
+    end
   end
 end

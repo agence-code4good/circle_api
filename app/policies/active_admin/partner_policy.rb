@@ -35,3 +35,7 @@ class ActiveAdmin::PartnerPolicy < ApplicationPolicy
   end
 end
 
+
+
+
+

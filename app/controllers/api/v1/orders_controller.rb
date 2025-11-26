@@ -20,19 +20,19 @@ class Api::V1::OrdersController < Api::BaseController
     end
 
     # Vérifier la validité des circle_codes de chaque order line
-    order.order_lines.each do |order_line|
-      result = CircleValidatorService.new(order_line.circle_code).validate
-      if result[:errors].any?
-        render json: { errors: result[:errors] }, status: :unprocessable_entity
-        return
-      end
-    end
+    # order.order_lines.each do |order_line|
+    #   result = CircleValidatorService.new(order_line.circle_code).validate
+    #   if result.any?
+    #     render json: { errors: result }, status: :unprocessable_entity
+    #     return
+    #   end
+    # end
 
     # Vérifier que la order line est valide (dans les validations du model OrderLine)
     if order.save
       render json: order, status: :created
     else
-      render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: format_errors(order) }, status: :unprocessable_entity
     end
   end
 
@@ -81,6 +81,28 @@ class Api::V1::OrdersController < Api::BaseController
     token = request.headers["Authorization"].to_s.remove("Bearer ")
     @current_partner = Partner.find_by(auth_token: token)
     head :unauthorized unless @current_partner
+  end
+
+  def format_errors(order)
+    errors = {}
+
+    # Erreurs de l'order
+    order.errors.full_messages.each do |message|
+      errors[:base] ||= []
+      errors[:base] << message
+    end
+
+    # Erreurs des order_lines
+    order.order_lines.each_with_index do |order_line, index|
+      next if order_line.errors.empty?
+
+      order_line.errors.each do |error|
+        errors[:"order_lines[#{index}].#{error.attribute}"] ||= []
+        errors[:"order_lines[#{index}].#{error.attribute}"] << error.message
+      end
+    end
+
+    errors
   end
 
 
