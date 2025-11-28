@@ -59,8 +59,3 @@ ActiveAdmin.register Partner do
     f.actions
   end
 end
-
-
-
-
-

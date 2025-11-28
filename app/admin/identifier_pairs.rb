@@ -52,10 +52,3 @@ ActiveAdmin.register IdentifierPair do
     f.actions
   end
 end
-
-
-
-
-
-
-

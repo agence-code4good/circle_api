@@ -15,8 +15,7 @@ class CircleKeyCalculatorService
       next unless for_calculation?(code)
       values_for_calculation << value
     end
-    calculated_key = calculate_key(values_for_calculation)
-    @errors
+    calculate_key(values_for_calculation)
   end
 
   private
@@ -25,15 +24,18 @@ class CircleKeyCalculatorService
     code_str = code.to_s
     return false unless code_str.start_with?("C")
 
-    last_char = code_str.last
+    last_char = code_str[-1]
     last_char.match?(/\d/)
   end
 
-    def calculate_key(values_for_calculation)
-      debugger
-      values_for_calculation.flatten.join.map do |value|
-        # convert letters to numbers (their position in the alphabet)
-        value.match?(/[A-Z]/) ? value.ord + 1 : value.to_i
-      end.sum % 100
+  def calculate_key(values_for_calculation)
+    flattened_codes = values_for_calculation.flatten.join.upcase.chars
+
+    values_sum = flattened_codes.sum do |value|
+      value.match?(/[A-Z]/) ? (value.ord - "A".ord) + 1 : value.to_i
     end
+
+    modulo = values_sum % 100
+    modulo.to_s.rjust(3, "0")
+  end
 end

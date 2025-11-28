@@ -4,21 +4,32 @@ class Product
   def initialize(code:, label:, starting_vintage:, late_vintage:, excluded_vintages:)
     @code = code
     @label = label
-    @starting_vintage = starting_vintage.to_i
-    @late_vintage = late_vintage.to_i
+    @starting_vintage = normalize_starting_vintage(starting_vintage)
+    @late_vintage = normalize_late_vintage(late_vintage)
     @excluded_vintages = write_excluded_vintages_from_range(excluded_vintages)
   end
 
 
   def vintage_allowed?(vintage)
-    return false if excluded_vintages.include?(vintage.to_i)
-    return false if starting_vintage != "ND" && vintage.to_i < starting_vintage
-    return false if late_vintage != "ND" && vintage.to_i > late_vintage
-    return false if vintage.to_i > Date.today.year
+    vintage_int = vintage.to_i
+    return false if excluded_vintages.include?(vintage_int)
+    return false if vintage_int < @starting_vintage
+    return false if vintage_int > @late_vintage
+    return false if vintage_int > Date.today.year
     true
   end
 
   private
+
+  def normalize_starting_vintage(vintage)
+    return 1855 if vintage.nil? || vintage.to_s.strip == "ND" || vintage.to_s.strip.empty?
+    vintage.to_i
+  end
+
+  def normalize_late_vintage(vintage)
+    return Date.today.year if vintage.nil? || vintage.to_s.strip == "ND" || vintage.to_s.strip.empty?
+    vintage.to_i
+  end
 
   def write_excluded_vintages_from_range(excluded_vintages)
     return [] if excluded_vintages.nil? ||

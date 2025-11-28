@@ -4,7 +4,6 @@ require_relative "base_validation"
 module Validations
   class InDatabaseCombinationValidation < BaseValidation
     def validate
-      debugger
       return nil if value.is_a?(String) && value == "00"
 
       combination_codes = rule["combination_codes"] || []

@@ -1,4 +1,11 @@
 class Api::BaseController < ActionController::API
   # Désactive la protection CSRF pour les endpoints API
-  # car les APIs utilisent généralement l'authentification par token
+
+  private
+
+  def authenticate_partner!
+    token = request.headers["Authorization"].to_s.remove("Bearer ")
+    @current_partner = Partner.find_by(auth_token: token)
+    head :unauthorized unless @current_partner
+  end
 end

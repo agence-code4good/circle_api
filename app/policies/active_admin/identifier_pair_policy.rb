@@ -34,4 +34,3 @@ class ActiveAdmin::IdentifierPairPolicy < ApplicationPolicy
     user.admin?
   end
 end
-

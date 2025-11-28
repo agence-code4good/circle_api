@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       # Validation "à blanc" (sans commande associée)
-      resource :validation, only: :create
+      post "validation", to: "validations#validate"
 
       # Commandes
       resources :orders, only: [ :create, :update, :show, :index ]

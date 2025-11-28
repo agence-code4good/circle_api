@@ -19,15 +19,6 @@ class Api::V1::OrdersController < Api::BaseController
       return
     end
 
-    # Vérifier la validité des circle_codes de chaque order line
-    # order.order_lines.each do |order_line|
-    #   result = CircleValidatorService.new(order_line.circle_code).validate
-    #   if result.any?
-    #     render json: { errors: result }, status: :unprocessable_entity
-    #     return
-    #   end
-    # end
-
     # Vérifier que la order line est valide (dans les validations du model OrderLine)
     if order.save
       render json: order, status: :created
@@ -77,11 +68,7 @@ class Api::V1::OrdersController < Api::BaseController
 
   private
 
-  def authenticate_partner!
-    token = request.headers["Authorization"].to_s.remove("Bearer ")
-    @current_partner = Partner.find_by(auth_token: token)
-    head :unauthorized unless @current_partner
-  end
+
 
   def format_errors(order)
     errors = {}
