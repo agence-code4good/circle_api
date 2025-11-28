@@ -1,1 +1,1 @@
-Rails app generated with MihiVai template.
+Rails app generated with Code4Good template.

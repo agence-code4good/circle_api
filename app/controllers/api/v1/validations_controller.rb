@@ -24,7 +24,7 @@ class Api::V1::ValidationsController < Api::BaseController
         circle_code: circle_code_results
       }, status: :ok
     else
-      # Lister les codes en erreur
+      # Lister les codes en erreur si erreurs présentes
       error_codes = validation_errors.keys.sort
       render json: {
         errors: error_codes,
@@ -79,7 +79,7 @@ class Api::V1::ValidationsController < Api::BaseController
     results.sort_by { |r| dictionary_order[r[:circle_code]] }
   end
 
-  # Méthode récursive pour mapper les valeurs vers leurs labels depuis le dictionnaire
+  # Méthode récursive pour mapper les valeurs vers leurs labels depuis le dictionnaire (pour les champs C79 C80 notamment)
   def map_enum_value(value, dictionary_entry)
     if value.is_a?(Array)
       # Si c'est un array, mapper récursivement chaque élément
