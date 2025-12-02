@@ -8,7 +8,7 @@ class Api::V1::OrdersController < Api::BaseController
 
     # Vérifier que l'utilisateur authentifié est le buyer
     policy = OrderPolicy.new(@current_partner, order)
-    unless policy.actor_role == :buyer
+    unless policy.create?
       render json: { error: "Forbidden : You must be the buyer to create an order" }, status: :forbidden
       return
     end
@@ -44,18 +44,12 @@ class Api::V1::OrdersController < Api::BaseController
       return
     end
 
-    # Vérifier que la transition de statut est autorisée
+    # Vérifier que la transition de statut est autorisée pour l'utilisateur authentifié
     new_status = order_params[:status]
     if new_status && new_status != @order.status.to_s
-
-      unless @order.allowed_transition?(new_status)
-        render json: { error: "Invalid status transition from '#{@order.status}' to '#{new_status}'" }, status: :unprocessable_entity
-        return
-      end
-
       # Vérifier que le statut est autorisé pour le rôle de l'utilisateur
       unless policy.allowed_status?(new_status)
-        render json: { error: "Status '#{new_status}' is not allowed for your role" }, status: :forbidden
+        render json: { error: "Forbidden : Status '#{new_status}' is not allowed for your role" }, status: :forbidden
         return
       end
     end
