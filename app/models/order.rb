@@ -5,9 +5,12 @@ class Order < ApplicationRecord
   validates :order_reference, presence: true
   validates :status, presence: true
   validates :order_lines, length: { minimum: 1 }
+  validate :status_must_be_nouvelle_commande_on_create, on: :create
   validate :total_volume_cannot_change_on_update, on: :update
   validate :order_reference_cannot_change_on_update, on: :update
-  validate :order_lines_are_valid
+  validate :status_is_valid
+  validate :status_transition_is_allowed, on: :update
+  validate :initial_order_reference_exists
 
   accepts_nested_attributes_for :order_lines
 
@@ -23,7 +26,8 @@ class Order < ApplicationRecord
     bon_de_commande: 5,
     mise_a_disposition: 6,
     bon_de_livraison: 7,
-    commande_cloturee: 8
+    commande_cloturee: 8,
+    annulee: 9
   }
 
   ALLOWED_TRANSITIONS = {
@@ -36,20 +40,46 @@ class Order < ApplicationRecord
     "bon_de_livraison"                        => %w[commande_cloturee]
   }.freeze
 
-  # Ransackable attributes pour la recherche dans l'admin
+  ## Ransackable attributes pour la recherche dans l'admin ##
   def self.ransackable_attributes(auth_object = nil)
     [ "buyer_id", "created_at", "id", "id_value", "note", "order_reference", "seller_id", "status", "updated_at" ]
   end
 
-  # Vérifie si une transition de statut est autorisée
-  def allowed_transition?(to_status)
-    from_status = status.to_s
-    allowed = ALLOWED_TRANSITIONS.fetch(from_status, [])
-    allowed.include?(to_status.to_s)
-  end
+  ## Méthodes liées à l'Order ##
 
   def total_volume
     order_lines.sum(&:total_volume)
+  end
+
+  ## Validations liées à l'Order ##
+
+  # Vérifie que le statut est valide
+  def status_is_valid
+    unless Order.statuses.key?(status)
+      errors.add(:status, "is not a valid status")
+    end
+  rescue ArgumentError
+    errors.add(:status, "is not a valid value")
+  end
+
+
+  # Vérifie que le statut est "nouvelle_commande" pour une nouvelle commande
+  def status_must_be_nouvelle_commande_on_create
+    return unless new_record?
+
+    unless status.to_s == "nouvelle_commande"
+      errors.add(:status, "must be 'nouvelle_commande' for new orders")
+    end
+  end
+
+  # Vérifie si une transition de statut est autorisée
+  def allowed_transition?(to_status, from_status: nil)
+    # Une commande peut toujours être annulée, quel que soit son statut actuel
+    return true if to_status.to_s == "annulee"
+
+    from_status ||= status.to_s
+    allowed = ALLOWED_TRANSITIONS.fetch(from_status, [])
+    allowed.include?(to_status.to_s)
   end
 
   private
@@ -83,14 +113,20 @@ class Order < ApplicationRecord
     end
   end
 
-  def order_lines_are_valid
-    order_lines.each do |order_line|
-      next if order_line.valid?
+  def initial_order_reference_exists
+    return if initial_order_reference.blank?
+    initial_order = Order.find_by(order_reference: initial_order_reference)
+    unless initial_order
+      errors.add(:initial_order_reference, "has to be an existing order reference")
+    end
+  end
 
-      # Si une order_line est invalide, on propage l'erreur au niveau de l'order
-      order_line.errors.full_messages.each do |message|
-        errors.add(:base, "Order line error: #{message}")
-      end
+  def status_transition_is_allowed
+    return if new_record?
+    return unless status_changed?
+
+    unless allowed_transition?(status, from_status: status_was)
+      errors.add(:status, "Invalid status transition from '#{status_was}' to '#{status}'")
     end
   end
 end

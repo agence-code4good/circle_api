@@ -1,10 +1,5 @@
 # app/views/api/v1/products/show.json.jbuilder
 json.product do
-  json.code @product.code
-  json.label @product.label
-  json.starting_vintage @product.starting_vintage
-  json.late_vintage @product.late_vintage
-  json.excluded_vintages @product.excluded_vintages
   json.family @product.family
   json.product_type @product.product_type
   json.product_complement @product.product_complement
@@ -16,8 +11,13 @@ json.product do
   json.mention @product.mention
   json.name @product.name
   json.label_complement @product.label_complement
+  json.label @product.label
   json.classification @product.classification
   json.classification_detail @product.classification_detail
   json.bottler @product.bottler
   json.color @product.color
+  json.starting_vintage @product.starting_vintage
+  json.late_vintage @product.late_vintage
+  json.excluded_vintages @product.excluded_vintages
+  json.c10 @product.code
 end

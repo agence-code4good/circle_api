@@ -30,9 +30,13 @@ class Product
 
   def vintage_allowed?(vintage)
     vintage_int = vintage.to_i
-    return false if excluded_vintages.include?(vintage_int)
-    return false if vintage_int < @starting_vintage
-    return false if vintage_int > @late_vintage
+    normalized_excluded_vintages = write_excluded_vintages_from_range
+    normalized_starting_vintage = normalize_starting_vintage
+    normalized_late_vintage = normalize_late_vintage
+
+    return false if normalized_excluded_vintages.include?(vintage_int)
+    return false if vintage_int < normalized_starting_vintage
+    return false if vintage_int > normalized_late_vintage
     return false if vintage_int > Date.today.year
     true
   end
@@ -63,9 +67,9 @@ class Product
         attributes = {
           code: c10, # C10
           label: row["Etiquette"],
-          starting_vintage: self.normalize_starting_vintage(row["Premier millésime"]),
-          late_vintage: self.normalize_late_vintage(row["Dernier Millésime"]),
-          excluded_vintages: self.write_excluded_vintages_from_range(row["Millésime(s) non produit(s)"]),
+          starting_vintage: row["Premier millésime"],
+          late_vintage: row["Dernier Millésime"],
+          excluded_vintages: row["Millésime(s) non produit(s)"],
           family: row["Famille"],
           product_type: row["Type produit"],
           product_complement: row["Complément Produit"],
@@ -90,26 +94,26 @@ class Product
     end
   end
 
-  def self.normalize_starting_vintage(vintage)
-    return 1855 if vintage.nil? || vintage.to_s.strip == "ND" || vintage.to_s.strip.empty?
-    vintage.to_i
+  def normalize_starting_vintage
+    return 1855 if @starting_vintage.nil? || @starting_vintage.to_s.strip == "ND" || @starting_vintage.to_s.strip.empty?
+    @starting_vintage.to_i
   end
 
-  def self.normalize_late_vintage(vintage)
-    return Date.today.year if vintage.nil? || vintage.to_s.strip == "ND" || vintage.to_s.strip.empty?
-    vintage.to_i
+  def normalize_late_vintage
+    return Date.today.year if @late_vintage.nil? || @late_vintage.to_s.strip == "ND" || @late_vintage.to_s.strip.empty?
+    @late_vintage.to_i
   end
 
-  def self.write_excluded_vintages_from_range(excluded_vintages)
-    return [] if excluded_vintages.nil? ||
-                excluded_vintages.to_s.strip.empty? ||
-                excluded_vintages.to_s.strip == "ND"
+  def write_excluded_vintages_from_range
+    return [] if @excluded_vintages.nil? ||
+                @excluded_vintages.to_s.strip.empty? ||
+                @excluded_vintages.to_s.strip == "ND"
 
     # Normaliser en array si c'est une string
-    ranges = if excluded_vintages.is_a?(Array)
-      excluded_vintages
+    ranges = if @excluded_vintages.is_a?(Array)
+      @excluded_vintages
     else
-      excluded_vintages.to_s.split(",").map(&:strip)
+      @excluded_vintages.to_s.split(",").map(&:strip)
     end
 
     # Parser chaque élément (peut être une plage "2003-2007" ou une année "2013")

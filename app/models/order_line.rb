@@ -5,7 +5,7 @@ class OrderLine < ApplicationRecord
   validate :is_valid
 
   def total_volume
-    circle_code["C2"].to_i
+    circle_code["C31"].is_a?(Array) ? circle_code["C31"].sum(&:to_i) : circle_code["C31"].to_i
   end
 
   def is_valid
@@ -18,6 +18,13 @@ class OrderLine < ApplicationRecord
       validation_errors.each do |code, errors_array|
         errors.add(:circle_code, "#{code}: #{errors_array.join(', ')}")
       end
+      return
+    end
+
+    circle_key = CircleKeyCalculatorService.new(circle_code).calculate
+    if circle_key != circle_code["CLE"]
+      errors.add(:circle_code, "La clé Circle n'est pas valide")
+      nil
     end
   end
 end

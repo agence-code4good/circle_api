@@ -15,12 +15,12 @@ ActiveAdmin.register Order do
   index do
     selectable_column
     id_column
-    column :buyer_id
-    column :created_at
-    column :note
     column :order_reference
+    column :buyer_id
     column :seller_id
+    column :note
     column :status
+    column :created_at
     column :updated_at
     actions
   end

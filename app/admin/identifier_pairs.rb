@@ -14,9 +14,9 @@ ActiveAdmin.register IdentifierPair do
   index do
     selectable_column
     id_column
-    column :partner
     column :my_alias
     column :partner_alias
+    column :partner
     column :active
     column :created_at
     column :updated_at

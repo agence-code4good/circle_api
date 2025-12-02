@@ -1,5 +1,6 @@
 class Api::V1::OrdersController < Api::BaseController
   before_action :authenticate_partner!
+  rescue_from ArgumentError, with: :handle_enum_argument_error
 
   def create
     # Vérifier que l'utilisateur authentifié est le buyer
@@ -21,14 +22,20 @@ class Api::V1::OrdersController < Api::BaseController
 
     # Vérifier que la order line est valide (dans les validations du model OrderLine)
     if order.save
-      render json: order, status: :created
+      @order = order
+      render json: { order: @order }, status: :created
     else
       render json: { errors: format_errors(order) }, status: :unprocessable_entity
     end
   end
 
   def update
-    @order = Order.find(params[:id])
+    @order = Order.find_by(order_reference: params[:id])
+    unless @order
+      render json: { error: "Order not found" }, status: :not_found
+      return
+    end
+
     policy = OrderPolicy.new(@current_partner, @order)
 
     # Vérifier que l'utilisateur a le droit de modifier cette commande
@@ -40,6 +47,7 @@ class Api::V1::OrdersController < Api::BaseController
     # Vérifier que la transition de statut est autorisée
     new_status = order_params[:status]
     if new_status && new_status != @order.status.to_s
+
       unless @order.allowed_transition?(new_status)
         render json: { error: "Invalid status transition from '#{@order.status}' to '#{new_status}'" }, status: :unprocessable_entity
         return
@@ -54,48 +62,57 @@ class Api::V1::OrdersController < Api::BaseController
 
     # Vérifier que la order line est valide et que le volume total de la commande n'a pas été modifié (dans les validations du model OrderLine & Order)
     if @order.update(order_params)
-      render json: @order, status: :ok
+      render json: { order: @order }, status: :ok
     else
-      render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: format_errors(@order) }, status: :unprocessable_entity
     end
-  end
-
-  def show
-  end
-
-  def index
   end
 
   private
 
-
-
   def format_errors(order)
     errors = {}
 
-    # Erreurs de l'order
-    order.errors.full_messages.each do |message|
-      errors[:base] ||= []
-      errors[:base] << message
+    # Erreurs de l'order (en excluant celles liées à l'association order_lines)
+    order.errors.each do |error|
+      # Ignorer les erreurs sur l'association order_lines
+      next if error.attribute.to_s.start_with?("order_lines")
+
+      if error.attribute == :base
+        errors[:base] ||= []
+        errors[:base] << error.message
+      else
+        errors[error.attribute] ||= []
+        errors[error.attribute] << error.message
+      end
     end
 
-    # Erreurs des order_lines
+    # Erreurs des order_lines (récupérées directement depuis chaque order_line)
     order.order_lines.each_with_index do |order_line, index|
       next if order_line.errors.empty?
 
       order_line.errors.each do |error|
-        errors[:"order_lines[#{index}].#{error.attribute}"] ||= []
-        errors[:"order_lines[#{index}].#{error.attribute}"] << error.message
+        errors[:"order_lines[#{index}]"] ||= []
+        message = error.message
+        errors[:"order_lines[#{index}]"] << message
       end
     end
 
     errors
   end
 
+  def handle_enum_argument_error(exception)
+    if exception.message.match?(/is not a valid/)
+      render json: { errors: [ "#{exception.message}" ] }, status: :unprocessable_entity
+    else
+      raise exception
+    end
+  end
 
   def order_params
     params.require(:order).permit(
       :order_reference,
+      :initial_order_reference,
       :buyer_id,
       :seller_id,
       :note,
