@@ -18,11 +18,12 @@ class OrderPolicy < ApplicationPolicy
   # Autorisation "générale" d'action
   def create?
     # Vérifier que le user authentifié est le buyer
-    true
+    actor_role == :buyer
   end
 
   def update?
-    true
+    # Vérifier que le user authentifié est le buyer ou le seller
+    actor_role == :buyer || actor_role == :seller
   end
 
   # Vérifie que le statut demandé est autorisé pour le rôle de l'utilisateur
