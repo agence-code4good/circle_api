@@ -2,7 +2,6 @@ class Api::V1::ProductsController < Api::BaseController
   before_action :authenticate_partner!
   def index
     @products = Product.all
-    debugger
   end
 
   def show
