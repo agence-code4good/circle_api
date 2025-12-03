@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root to: "admin/dashboard#index"
+  get "legal", to: "pages#legal"
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self) rescue ActiveAdmin::DatabaseHitDuringLoad
