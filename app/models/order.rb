@@ -15,6 +15,7 @@ class Order < ApplicationRecord
   accepts_nested_attributes_for :order_lines
 
   attr_accessor :original_total_volume
+  attr_accessor :original_volumes_by_group
 
   before_validation :store_original_total_volume, on: :update, prepend: true
 
@@ -86,22 +87,45 @@ class Order < ApplicationRecord
 
   def store_original_total_volume
     return if new_record?
-    return if @original_total_volume # Ne pas recalculer si déjà stocké
+    return if @original_volumes_by_group # Ne pas recalculer si déjà stocké
 
-    # Récupérer le volume total original depuis la base de données
+    # Récupérer les order_lines originales depuis la base de données
     # sans affecter l'association order_lines qui contient les modifications en cours
     original_lines = OrderLine.where(order_id: id)
-    @original_total_volume = original_lines.sum(&:total_volume)
+
+    # Grouper par combinaison C10/C11 et calculer le volume total de chaque groupe
+    @original_volumes_by_group = {}
+    original_lines.each do |line|
+      group_key = group_key_for_line(line.circle_code)
+      @original_volumes_by_group[group_key] ||= 0
+      @original_volumes_by_group[group_key] += line.total_volume
+    end
   end
 
   def total_volume_cannot_change_on_update
     return if new_record?
-    return unless @original_total_volume
+    return unless @original_volumes_by_group
 
-    # Le volume total calculé inclut les modifications des nested attributes
-    new_total_volume = total_volume
-    if new_total_volume != @original_total_volume
-      errors.add(:base, "Le volume total ne peut pas être modifié (était #{@original_total_volume}, devient #{new_total_volume})")
+    # Calculer les nouveaux volumes par groupe C10/C11
+    new_volumes_by_group = {}
+    order_lines.each do |line|
+      next if line.marked_for_destruction?
+
+      group_key = group_key_for_line(line.circle_code)
+      new_volumes_by_group[group_key] ||= 0
+      new_volumes_by_group[group_key] += line.total_volume
+    end
+
+    # Vérifier que chaque groupe a le même volume total
+    all_group_keys = (@original_volumes_by_group.keys + new_volumes_by_group.keys).uniq
+
+    all_group_keys.each do |group_key|
+      original_volume = @original_volumes_by_group[group_key] || 0
+      new_volume = new_volumes_by_group[group_key] || 0
+
+      if original_volume != new_volume
+        errors.add(:base, "Le volume total pour le groupe #{group_key} ne peut pas être modifié (était #{original_volume}, devient #{new_volume})")
+      end
     end
   end
 
@@ -128,5 +152,17 @@ class Order < ApplicationRecord
     unless allowed_transition?(status, from_status: status_was)
       errors.add(:status, "Invalid status transition from '#{status_was}' to '#{status}'")
     end
+  end
+
+  # Génère une clé unique pour un groupe basée sur C10 et C11
+  def group_key_for_line(circle_code)
+    c10 = circle_code["C10"]
+    c11 = circle_code["C11"]
+
+    # C10 peut être un array, donc on le normalise en string
+    c10_normalized = c10.is_a?(Array) ? c10.sort.join(",") : c10.to_s
+    c11_normalized = c11.to_s
+
+    "#{c10_normalized}|#{c11_normalized}"
   end
 end

@@ -5,7 +5,7 @@ class OrderLine < ApplicationRecord
   validate :is_valid
 
   def total_volume
-    circle_code["C31"].is_a?(Array) ? circle_code["C31"].sum(&:to_i) : circle_code["C31"].to_i
+    circle_code["C31"].to_i
   end
 
   def is_valid
