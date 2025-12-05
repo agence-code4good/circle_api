@@ -86,14 +86,7 @@
   },
   "C13": {
     "name": "BottleSize",
-    "validations": [
-      { "type": "single_value" },
-      {
-        "type": "forbidden_value",
-        "forbidden_values": ["00"]
-      },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C14": {
     "name": "TrafficRight",

@@ -3,24 +3,20 @@ class Api::V1::OrdersController < Api::BaseController
   rescue_from ArgumentError, with: :handle_enum_argument_error
 
   def create
-    # Vérifier que l'utilisateur authentifié est le buyer
     order = Order.new(order_params)
 
-    # Vérifier que l'utilisateur authentifié est le buyer
     policy = OrderPolicy.new(@current_partner, order)
     unless policy.create?
       render json: { error: "Forbidden : You must be the buyer to create an order" }, status: :forbidden
       return
     end
 
-    # Vérifier la validité du status (pour une nouvelle commande, on vérifie que le status est "nouvelle_commande")
     status_string = order.status.to_s
     unless status_string == "nouvelle_commande"
       render json: { error: "Invalid status for new order. Must be 'nouvelle_commande'" }, status: :unprocessable_entity
       return
     end
 
-    # Vérifier que la order line est valide (dans les validations du model OrderLine)
     if order.save
       @order = order
       render json: { order: @order }, status: :created
@@ -37,28 +33,87 @@ class Api::V1::OrdersController < Api::BaseController
     end
 
     policy = OrderPolicy.new(@current_partner, @order)
-
-    # Vérifier que l'utilisateur a le droit de modifier cette commande
     unless policy.update?
       render json: { error: "Forbidden" }, status: :forbidden
       return
     end
 
-    # Vérifier que la transition de statut est autorisée pour l'utilisateur authentifié
     new_status = order_params[:status]
     if new_status && new_status != @order.status.to_s
-      # Vérifier que le statut est autorisé pour le rôle de l'utilisateur
       unless policy.allowed_status?(new_status)
         render json: { error: "Forbidden : Status '#{new_status}' is not allowed for your role" }, status: :forbidden
         return
       end
     end
 
-    # Vérifier que la order line est valide et que le volume total de la commande n'a pas été modifié (dans les validations du model OrderLine & Order)
-    if @order.update(order_params)
-      render json: { order: @order }, status: :ok
+    order_lines_in_params = params.dig(:order, :order_lines_attributes)
+    
+    if order_lines_in_params
+      # Stocker les volumes originaux AVANT toute modification
+      @order.prepare_order_lines_replacement
+      
+      # Sauvegarder les order_lines originales pour restauration en cas d'erreur
+      original_order_lines_ids = @order.order_lines.pluck(:id)
+      
+      # Créer temporairement les nouvelles order_lines pour validation (sans toucher aux anciennes)
+      new_order_lines_data = order_params[:order_lines_attributes] || []
+      temp_order_lines = new_order_lines_data.map do |attrs|
+        OrderLine.new(order: @order, circle_code: attrs[:circle_code])
+      end
+      
+      # Valider les nouvelles order_lines individuellement
+      temp_order_lines.each(&:valid?)
+      temp_order_lines.each do |line|
+        line.errors.each do |error|
+          @order.errors.add(:order_lines, "#{error.attribute}: #{error.message}")
+        end
+      end
+      
+      # Remplacer temporairement l'association pour la validation de l'order
+      # (sans toucher à la base de données)
+      original_order_lines = @order.order_lines.to_a
+      @order.association(:order_lines).target = temp_order_lines
+      
+      # Assigner les autres attributs
+      update_params = order_params.except(:order_lines_attributes)
+      @order.assign_attributes(update_params)
+      
+      # Valider l'order avec les nouvelles order_lines temporaires
+      unless @order.valid?
+        # Restaurer l'association originale en cas d'erreur
+        @order.association(:order_lines).target = original_order_lines
+        @order.association(:order_lines).reset
+        render json: { errors: format_errors(@order) }, status: :unprocessable_entity
+        return
+      end
+      
+      # Si validation réussit, remplacer dans une transaction
+      Order.transaction do
+        # Supprimer les anciennes order_lines
+        OrderLine.where(id: original_order_lines_ids).destroy_all
+        
+        # Réinitialiser l'association pour éviter les conflits
+        @order.association(:order_lines).reset
+        
+        # Créer les nouvelles order_lines
+        new_order_lines_data.each do |attrs|
+          @order.order_lines.create!(circle_code: attrs[:circle_code])
+        end
+        
+        # Sauvegarder les autres attributs de l'order
+        @order.save!
+      end
+      
+      render json: { order: @order.reload }, status: :ok
     else
-      render json: { errors: format_errors(@order) }, status: :unprocessable_entity
+      # Pas de modification des order_lines, mise à jour normale
+      update_params = order_params.except(:order_lines_attributes)
+      
+      if @order.update(update_params)
+        render json: { order: @order }, status: :ok
+      else
+        render json: { errors: format_errors(@order) }, status: :unprocessable_entity
+      end
     end
   end
 
@@ -67,9 +122,7 @@ class Api::V1::OrdersController < Api::BaseController
   def format_errors(order)
     errors = {}
 
-    # Erreurs de l'order (en excluant celles liées à l'association order_lines)
     order.errors.each do |error|
-      # Ignorer les erreurs sur l'association order_lines
       next if error.attribute.to_s.start_with?("order_lines")
 
       if error.attribute == :base
@@ -81,14 +134,12 @@ class Api::V1::OrdersController < Api::BaseController
       end
     end
 
-    # Erreurs des order_lines (récupérées directement depuis chaque order_line)
     order.order_lines.each_with_index do |order_line, index|
       next if order_line.errors.empty?
 
       order_line.errors.each do |error|
         errors[:"order_lines[#{index}]"] ||= []
-        message = error.message
-        errors[:"order_lines[#{index}]"] << message
+        errors[:"order_lines[#{index}]"] << error.message
       end
     end
 
@@ -112,10 +163,8 @@ class Api::V1::OrdersController < Api::BaseController
       :note,
       :status,
       order_lines_attributes: [
-        :id,
-        :_destroy,
         { circle_code: {} }
       ]
-  )
+    )
   end
 end

@@ -4,6 +4,7 @@ class Order < ApplicationRecord
   validates :seller_id, presence: true
   validates :order_reference, presence: true
   validates :status, presence: true
+  validates :order_reference, uniqueness: true, presence: true
   validates :order_lines, length: { minimum: 1 }
   validate :status_must_be_nouvelle_commande_on_create, on: :create
   validate :total_volume_cannot_change_on_update, on: :update
@@ -50,6 +51,20 @@ class Order < ApplicationRecord
 
   def total_volume
     order_lines.sum(&:total_volume)
+  end
+
+  # Prépare la suppression/recréation des order_lines en stockant les volumes originaux
+  def prepare_order_lines_replacement
+    return if new_record?
+
+    # Stocker les volumes originaux AVANT de supprimer les order_lines
+    original_lines = OrderLine.from_order_reference(order_reference)
+    @original_volumes_by_group = {}
+    original_lines.each do |line|
+      group_key = group_key_for_line(line.circle_code)
+      @original_volumes_by_group[group_key] ||= 0
+      @original_volumes_by_group[group_key] += line.total_volume
+    end
   end
 
   ## Validations liées à l'Order ##
@@ -156,13 +171,6 @@ class Order < ApplicationRecord
 
   # Génère une clé unique pour un groupe basée sur C10 et C11
   def group_key_for_line(circle_code)
-    c10 = circle_code["C10"]
-    c11 = circle_code["C11"]
-
-    # C10 peut être un array, donc on le normalise en string
-    c10_normalized = c10.is_a?(Array) ? c10.sort.join(",") : c10.to_s
-    c11_normalized = c11.to_s
-
-    "#{c10_normalized}|#{c11_normalized}"
+    "#{circle_code["C10"]}|#{circle_code["C11"]}"
   end
 end
