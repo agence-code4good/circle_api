@@ -129,11 +129,17 @@ class Api::V1::OrdersController < Api::BaseController
     errors = {}
 
     order.errors.each do |error|
-      next if error.attribute.to_s.start_with?("order_lines")
-
       if error.attribute == :base
         errors[:base] ||= []
         errors[:base] << error.message
+      elsif error.attribute == :order_lines
+        # Erreurs ajoutées directement avec l'attribut :order_lines
+        errors[:order_lines] ||= []
+        errors[:order_lines] << error.message
+      elsif error.attribute.to_s.start_with?("order_lines[")
+        # Erreurs pour des order_lines spécifiques
+        errors[error.attribute] ||= []
+        errors[error.attribute] << error.message
       else
         errors[error.attribute] ||= []
         errors[error.attribute] << error.message
@@ -168,6 +174,9 @@ class Api::V1::OrdersController < Api::BaseController
       :seller_id,
       :note,
       :status,
+      :accompanying_document_url,
+      :latest_instruction_due_date,
+      :estimated_availability_earliest_at,
       order_lines_attributes: [
         { circle_code: {} }
       ]

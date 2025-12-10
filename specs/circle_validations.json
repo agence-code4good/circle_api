@@ -224,7 +224,7 @@
         "type": "dependency",
         "source_code": "C26",
         "source_value": "00",
-        "target_value": "A0"
+        "target_value": "00"
       }
     ]
   },
@@ -288,15 +288,7 @@
   },
   "C39D": {
     "name": "CaseBarcodeNumber",
-    "validations": [
-      {
-        "type": "dependency",
-        "source_code": "C38",
-        "source_value": "00",
-        "target_value": "00"
-      },
-      { "type": "single_value" }
-    ]
+    "validations": [{ "type": "single_value" }]
   },
   "C40": {
     "name": "VintageCertificationOrganism",

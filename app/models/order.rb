@@ -6,6 +6,13 @@ class Order < ApplicationRecord
   validates :status, presence: true
   validates :order_reference, uniqueness: true, presence: true
   validates :order_lines, length: { minimum: 1 }
+
+  validates :accompanying_document_url,
+            format: { with: URI::DEFAULT_PARSER.make_regexp(%w[https]), message: "doit être une url https valide" },
+            allow_blank: true
+
+  validate :latest_instruction_due_date_must_be_future_or_today
+  validate :estimated_availability_earliest_at_must_be_future_or_today
   validate :status_must_be_nouvelle_commande_on_create, on: :create
   validate :total_volume_cannot_change_on_update, on: :update
   validate :order_reference_cannot_change_on_update, on: :update
@@ -44,7 +51,7 @@ class Order < ApplicationRecord
 
   ## Ransackable attributes pour la recherche dans l'admin ##
   def self.ransackable_attributes(auth_object = nil)
-    [ "buyer_id", "created_at", "id", "id_value", "note", "order_reference", "seller_id", "status", "updated_at" ]
+    [ "buyer_id", "created_at", "id", "id_value", "note", "order_reference", "seller_id", "status", "updated_at", "accompanying_document_url", "latest_instruction_due_date", "estimated_availability_earliest_at" ]
   end
 
   ## Méthodes liées à l'Order ##
@@ -72,10 +79,10 @@ class Order < ApplicationRecord
   # Vérifie que le statut est valide
   def status_is_valid
     unless Order.statuses.key?(status)
-      errors.add(:status, "is not a valid status")
+      errors.add(:status, "n'est pas un statut valide")
     end
   rescue ArgumentError
-    errors.add(:status, "is not a valid value")
+    errors.add(:status, "n'est pas une valeur valide")
   end
 
 
@@ -84,7 +91,7 @@ class Order < ApplicationRecord
     return unless new_record?
 
     unless status.to_s == "nouvelle_commande"
-      errors.add(:status, "must be 'nouvelle_commande' for new orders")
+      errors.add(:status, "doit être 'nouvelle_commande' pour les nouvelles commandes")
     end
   end
 
@@ -117,6 +124,7 @@ class Order < ApplicationRecord
     end
   end
 
+  # Vérifie que le volume total du couple C10/C11 ne peut pas être modifié après la création
   def total_volume_cannot_change_on_update
     return if new_record?
     return unless @original_volumes_by_group
@@ -144,6 +152,7 @@ class Order < ApplicationRecord
     end
   end
 
+  # Vérifie que la référence de commande ne peut pas être modifiée après la création
   def order_reference_cannot_change_on_update
     return if new_record?
 
@@ -152,20 +161,40 @@ class Order < ApplicationRecord
     end
   end
 
+  # Vérifie que la référence de commande initiale existe
   def initial_order_reference_exists
     return if initial_order_reference.blank?
     initial_order = Order.find_by(order_reference: initial_order_reference)
     unless initial_order
-      errors.add(:initial_order_reference, "has to be an existing order reference")
+      errors.add(:initial_order_reference, "doit être une référence de commande existante")
     end
   end
 
+  # Vérifie que la transition de statut est autorisée
   def status_transition_is_allowed
     return if new_record?
     return unless status_changed?
 
     unless allowed_transition?(status, from_status: status_was)
-      errors.add(:status, "Invalid status transition from '#{status_was}' to '#{status}'")
+      errors.add(:status, "Transition de statut invalide de '#{status_was}' à '#{status}'")
+    end
+  end
+
+  # Vérifie que la date d'instruction de mise au plus tard est posterieure à la date du jour
+  def latest_instruction_due_date_must_be_future_or_today
+    return if latest_instruction_due_date.blank?
+
+    if latest_instruction_due_date < Date.current
+      errors.add(:latest_instruction_due_date, "doit être posterieur à la date du jour")
+    end
+  end
+
+  # Vérifie que la date date de mise à disposition estimée au plus tôt de la commande est posterieure à la date du jour
+  def estimated_availability_earliest_at_must_be_future_or_today
+    return if estimated_availability_earliest_at.blank?
+
+    if estimated_availability_earliest_at < Date.current
+      errors.add(:estimated_availability_earliest_at, "doit être posterieur à la date du jour")
     end
   end
 

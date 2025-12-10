@@ -232,7 +232,7 @@
         "type": "dependency",
         "source_code": "C26",
         "source_value": "00",
-        "target_value": "A0"
+        "target_value": "00"
       }
     ]
   },
