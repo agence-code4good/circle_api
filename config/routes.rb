@@ -16,6 +16,9 @@ Rails.application.routes.draw do
 
       # Catalogue produits (lecture seule)
       resources :products, only: [ :index, :show ], param: :c10
+
+      # Recherche de circle_values (pour la enrichir les order_lines des commandes)
+      post "search_circle_values", to: "circle_values#search"
     end
   end
 end
