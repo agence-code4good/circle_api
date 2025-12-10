@@ -86,14 +86,7 @@
   },
   "C13": {
     "name": "BottleSize",
-    "validations": [
-      { "type": "single_value" },
-      {
-        "type": "forbidden_value",
-        "forbidden_values": ["00"]
-      },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C14": {
     "name": "TrafficRight",
@@ -231,7 +224,7 @@
         "type": "dependency",
         "source_code": "C26",
         "source_value": "00",
-        "target_value": "A0"
+        "target_value": "00"
       }
     ]
   },
@@ -295,15 +288,7 @@
   },
   "C39D": {
     "name": "CaseBarcodeNumber",
-    "validations": [
-      {
-        "type": "dependency",
-        "source_code": "C38",
-        "source_value": "00",
-        "target_value": "00"
-      },
-      { "type": "single_value" }
-    ]
+    "validations": [{ "type": "single_value" }]
   },
   "C40": {
     "name": "VintageCertificationOrganism",

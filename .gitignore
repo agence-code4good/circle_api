@@ -35,3 +35,6 @@
 /config/credentials/staging.key
 
 /config/credentials/production.key
+
+# Ignore .DS_Store
+.DS_Store

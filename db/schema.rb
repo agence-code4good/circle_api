@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_02_085808) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_10_130411) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,9 +59,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_085808) do
   end
 
   create_table "orders", force: :cascade do |t|
+    t.string "accompanying_document_url"
     t.string "buyer_id"
     t.datetime "created_at", null: false
+    t.date "estimated_availability_earliest_at"
     t.string "initial_order_reference"
+    t.date "latest_instruction_due_date"
     t.string "note"
     t.string "order_reference"
     t.string "seller_id"

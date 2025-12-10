@@ -15,6 +15,19 @@ class OrderPolicy < ApplicationPolicy
     bon_de_livraison
   ].freeze
 
+  # Statuts où les order_lines ne sont plus modifiables par personne
+  ORDER_LINES_LOCKED_STATUSES = %w[
+    mise_a_disposition
+    bon_de_livraison
+    commande_cloturee
+  ].freeze
+
+  # Statuts où les order_lines ne sont modifiables que par le seller
+  ORDER_LINES_SELLER_ONLY_STATUSES = %w[
+    details_de_mise_et_logistique_confirmes
+    bon_de_commande
+  ].freeze
+
   # Autorisation "générale" d'action
   def create?
     # Vérifier que le user authentifié est le buyer
@@ -23,6 +36,24 @@ class OrderPolicy < ApplicationPolicy
 
   def update?
     # Vérifier que le user authentifié est le buyer ou le seller
+    actor_role == :buyer || actor_role == :seller
+  end
+
+  # Vérifie si les order_lines peuvent être modifiées
+  def can_modify_order_lines?
+    return false unless record
+
+    current_status = record.status.to_s
+
+    # Si le statut est verrouillé, personne ne peut modifier
+    return false if ORDER_LINES_LOCKED_STATUSES.include?(current_status)
+
+    # Si le statut nécessite que ce soit le seller, vérifier le rôle
+    if ORDER_LINES_SELLER_ONLY_STATUSES.include?(current_status)
+      return actor_role == :seller
+    end
+
+    # Sinon, autoriser si c'est le buyer ou le seller
     actor_role == :buyer || actor_role == :seller
   end
 

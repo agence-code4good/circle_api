@@ -4,8 +4,10 @@ class OrderLine < ApplicationRecord
   validates :circle_code, presence: true
   validate :is_valid
 
+  scope :from_order_reference, ->(order_reference) { where(order_id: Order.find_by(order_reference: order_reference).id) }
+
   def total_volume
-    circle_code["C31"].is_a?(Array) ? circle_code["C31"].sum(&:to_i) : circle_code["C31"].to_i
+    circle_code["C31"].to_i
   end
 
   def is_valid
