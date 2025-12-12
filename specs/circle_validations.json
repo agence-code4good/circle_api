@@ -189,6 +189,12 @@
         "target_value": "00"
       },
       {
+        "type": "dependency",
+        "source_code": "C26",
+        "source_value": "A0",
+        "target_value": "00"
+      },
+      {
         "type": "casket_value",
         "allowed_values": ["00"]
       },
@@ -203,6 +209,12 @@
         "type": "dependency",
         "source_code": "C26",
         "source_value": "00",
+        "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C26",
+        "source_value": "A0",
         "target_value": "00"
       },
       { "type": "single_value" }
@@ -225,6 +237,12 @@
         "source_code": "C26",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C26",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
@@ -327,6 +345,12 @@
         "source_code": "C40",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C40",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
@@ -372,6 +396,12 @@
         "source_code": "C40",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C40",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
@@ -414,6 +444,12 @@
         "source_code": "C44",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C44",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
@@ -428,6 +464,12 @@
         "type": "dependency",
         "source_code": "C44",
         "source_value": "00",
+        "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C44",
+        "source_value": "A0",
         "target_value": "00"
       }
     ]
@@ -452,6 +494,12 @@
         "source_code": "C44",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C44",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
@@ -660,6 +708,12 @@
       {
         "type": "casket_value",
         "allowed_values": ["00"]
+      },
+      {
+        "type": "dependency",
+        "source_code": "C78",
+        "source_value": "00",
+        "target_value": "00"
       }
     ]
   },

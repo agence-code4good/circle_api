@@ -21,7 +21,7 @@ class CircleValidatorService
   CONFIG_JSON = File.read(Rails.root.join("specs", "circle_validations.json"))
 
   def initialize(circle_values, config_json = CONFIG_JSON)
-    @circle_values = circle_values
+    @circle_values = parse_circle_values(circle_values)
     @config = JSON.parse(config_json)
     @errors = {}
   end
@@ -42,5 +42,30 @@ class CircleValidatorService
       end
     end
     @errors
+  end
+
+  private
+
+  def parse_circle_values(values)
+    return values unless values.is_a?(Hash)
+
+    values.transform_values do |val|
+      parse_json_value(val)
+    end
+  end
+
+  def parse_json_value(val)
+    return val unless val.is_a?(String)
+
+    # Vérifier si c'est une string JSON valide (array ou object)
+    stripped = val.strip
+    return val unless (stripped.start_with?("[") && stripped.end_with?("]")) ||
+                      (stripped.start_with?("{") && stripped.end_with?("}"))
+
+    begin
+      JSON.parse(val)
+    rescue JSON::ParserError
+      val
+    end
   end
 end
