@@ -58,7 +58,11 @@ module Validations
     end
 
     def find_product
-      self.class.products_csv[value]
+      if value.is_a?(Array)
+        value.map { |v| self.class.products_csv[v] }
+      else
+        self.class.products_csv[value].to_a
+      end
     end
 
     private

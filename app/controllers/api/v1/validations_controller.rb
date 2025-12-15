@@ -53,8 +53,15 @@ class Api::V1::ValidationsController < Api::BaseController
       # Récupérer le label depuis le dictionnaire
       label = dictionary_entry&.dig("label") || code_str
 
-      # Récupérer la valeur lisible depuis l'enum (gère les arrays imbriqués récursivement)
-      enum_value = map_enum_value(value, dictionary_entry)
+      # Récupérer la valeur lisible :
+      # - cas général : via le dictionnaire (enum)
+      # - cas particulier C10 : via le label du produit
+      enum_value =
+        if code_str == "C10"
+          map_product_label_value(value)
+        else
+          map_enum_value(value, dictionary_entry)
+        end
 
       # Vérifier si ce code a des erreurs
       has_errors = validation_errors.key?(code_str)
@@ -88,5 +95,19 @@ class Api::V1::ValidationsController < Api::BaseController
       # Si c'est une valeur simple, la mapper vers sa valeur dans le dictionnaire
       dictionary_entry&.dig("enum", value.to_s) || value.to_s
     end
+  end
+
+  # Pour C10 : mapper le(s) code(s) produit(s) vers leur label
+  def map_product_label_value(value)
+    if value.is_a?(Array)
+      value.map { |v| product_label_for_code(v) }
+    else
+      product_label_for_code(value)
+    end
+  end
+
+  def product_label_for_code(code)
+    product = Validations::BaseValidation.products_csv[code.to_s]
+    product&.label || code.to_s
   end
 end

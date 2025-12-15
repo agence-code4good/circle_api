@@ -5,18 +5,28 @@ module Validations
   class ProductValidation < BaseValidation
     def initialize(code, value, rule, version, circle_values)
       super(code, value, rule, version, circle_values)
-      @product = find_product
+      @products = find_product
     end
 
     def validate
-      if @product.nil?
-        return "Le produit #{value} n'existe pas."
-      end
+      errors = []
       vintage = circle_values.dig("C11")
 
-      unless @product.vintage_allowed?(vintage)
-       "Le millésime #{vintage} n'existe pas pour le produit #{@product.code}."
+      @products.each_with_index do |product, index|
+        if product.nil?
+          errors << "Le produit #{value} n'existe pas."
+          next
+        end
+
+        current_vintage = vintage.is_a?(Array) ? vintage[index] : vintage
+
+        unless product.vintage_allowed?(current_vintage)
+          errors << "Le millésime #{current_vintage} n'existe pas pour le produit #{product.code}."
+        end
       end
+
+      return nil if errors.empty?
+      errors
     end
 
     def default_error_message(code)

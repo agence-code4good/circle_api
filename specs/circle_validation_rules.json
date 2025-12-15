@@ -57,10 +57,9 @@
     "name": "Product",
     "validations": [
       { "type": "product_validation" },
-      { "type": "in_database" },
       {
         "type": "casket_value",
-        "match_array_length": true
+        "match_c2_length": true
       }
     ]
   },
@@ -71,7 +70,11 @@
         "type": "forbidden_value",
         "forbidden_values": ["00"]
       },
-      { "type": "single_value" }
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
     ]
   },
   "C12": {
@@ -81,7 +84,7 @@
       { "type": "numeric_value", "casket_allowed": true },
       {
         "type": "casket_value",
-        "match_array_length": true
+        "match_c2_length": true
       }
     ]
   },
@@ -89,36 +92,77 @@
     "name": "BottleSize",
     "validations": [
       { "type": "single_value" },
+      { "type": "in_database" },
       {
         "type": "forbidden_value",
         "forbidden_values": ["00"]
       },
-      { "type": "in_database" }
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
     ]
   },
   "C14": {
     "name": "TrafficRight",
-    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "in_database" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C15": {
     "name": "EmptyBottleWeight",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C16": {
     "name": "FullBottleWeight",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C17": {
     "name": "BottleHeight",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C18": {
     "name": "BottleDiameter",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C19": {
     "name": "NeckBottleDiameter",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C20": {
     "name": "LogoPackaging",
@@ -163,26 +207,50 @@
   },
   "C22": {
     "name": "LabelLenght",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C23": {
     "name": "LabelWidth",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C24": {
     "name": "BackLabelLenght",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C25": {
     "name": "BackLabelWidth",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C26": {
     "name": "RewardType",
     "validations": [
       {
         "type": "casket_value",
-        "match_array_length": true
+        "match_c2_length": true
       },
       { "type": "in_database" }
     ]
@@ -194,6 +262,12 @@
         "type": "dependency",
         "source_code": "C26",
         "source_value": "00",
+        "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C26",
+        "source_value": "A0",
         "target_value": "00"
       },
       {
@@ -211,6 +285,12 @@
         "type": "dependency",
         "source_code": "C26",
         "source_value": "00",
+        "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C26",
+        "source_value": "A0",
         "target_value": "00"
       },
       { "type": "single_value" }
@@ -233,12 +313,29 @@
         "source_code": "C26",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C26",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
   "C30": {
     "name": "Capping",
-    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "in_database" },
+      {
+        "type": "forbidden_value",
+        "forbidden_values": ["00"]
+      },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C31": {
     "name": "Volume",
@@ -254,11 +351,23 @@
   },
   "C34": {
     "name": "HarvestDate",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C35": {
     "name": "BottlingDate",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C36": {
     "name": "BottleBarcodeOrigin",
@@ -296,15 +405,7 @@
   },
   "C39D": {
     "name": "CaseBarcodeNumber",
-    "validations": [
-      {
-        "type": "dependency",
-        "source_code": "C38",
-        "source_value": "00",
-        "target_value": "00"
-      },
-      { "type": "single_value" }
-    ]
+    "validations": [{ "type": "single_value" }]
   },
   "C40": {
     "name": "VintageCertificationOrganism",
@@ -343,6 +444,12 @@
         "source_code": "C40",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C40",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
@@ -388,6 +495,12 @@
         "source_code": "C40",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C40",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
@@ -430,6 +543,12 @@
         "source_code": "C44",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C44",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
@@ -444,6 +563,12 @@
         "type": "dependency",
         "source_code": "C44",
         "source_value": "00",
+        "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C44",
+        "source_value": "A0",
         "target_value": "00"
       }
     ]
@@ -468,12 +593,25 @@
         "source_code": "C44",
         "source_value": "00",
         "target_value": "00"
+      },
+      {
+        "type": "dependency",
+        "source_code": "C44",
+        "source_value": "A0",
+        "target_value": "A0"
       }
     ]
   },
   "C48": {
     "name": "Sulphite",
-    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "in_database" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C49": {
     "name": "SulphitesLanguage",
@@ -676,6 +814,12 @@
       {
         "type": "casket_value",
         "allowed_values": ["00"]
+      },
+      {
+        "type": "dependency",
+        "source_code": "C78",
+        "source_value": "00",
+        "target_value": "00"
       }
     ]
   },

@@ -5,7 +5,7 @@ module Validations
   class ForbiddenValueValidation < BaseValidation
     def validate
       forbidden = rule["forbidden_values"] || []
-      values = value.is_a?(Array) ? value : [value]
+      values = value.is_a?(Array) ? value : [ value ]
       violating = values & forbidden
       unless violating.empty?
         return "La valeur '#{violating.join(', ')}' présente pour #{code} n'est pas autorisée."

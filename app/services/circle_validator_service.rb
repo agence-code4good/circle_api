@@ -18,10 +18,10 @@ class CircleValidatorService
     "product_validation"      => Validations::ProductValidation
   }
 
-  CONFIG_JSON = File.read(Rails.root.join("specs", "circle_validations.json"))
+  CONFIG_JSON = File.read(Rails.root.join("specs", "circle_validation_rules.json"))
 
   def initialize(circle_values, config_json = CONFIG_JSON)
-    @circle_values = parse_circle_values(circle_values)
+    @circle_values = circle_values
     @config = JSON.parse(config_json)
     @errors = {}
   end
@@ -29,15 +29,30 @@ class CircleValidatorService
   def validate
     @config.each do |code, settings|
       value = @circle_values[code]
-      @circle_values[code] = "00" && value = "00" if value.nil?  # Valeur par défaut à "00" (ND) si aucune valeur n'est fournie
+      # Valeur par défaut quand aucune valeur n'est fournie ("00" ou array de "00" si coffret)
+      if value.nil?
+        if needs_casket_default_array?(settings)
+          c2_value = @circle_values["C2"]
+          length = c2_value.is_a?(Array) ? c2_value.first.to_i : c2_value.to_i
+          value = Array.new(length, "00")
+          @circle_values[code] = value
+        else
+          value = "00"
+          @circle_values[code] = "00"
+        end
+      end
       settings["validations"].each do |rule|
         validation_class = VALIDATION_CLASSES[rule["type"]]
-        next if validation_class.nil?
+          next if validation_class.nil?
         validator = validation_class.new(code, value, rule, version, circle_values)
         error = validator.validate
         if error
           @errors[code] ||= []
-          @errors[code] << error
+            if error.is_a?(Array)
+              @errors[code].concat(error)
+            else
+              @errors[code] << error
+            end
         end
       end
     end
@@ -46,26 +61,7 @@ class CircleValidatorService
 
   private
 
-  def parse_circle_values(values)
-    return values unless values.is_a?(Hash)
-
-    values.transform_values do |val|
-      parse_json_value(val)
-    end
-  end
-
-  def parse_json_value(val)
-    return val unless val.is_a?(String)
-
-    # Vérifier si c'est une string JSON valide (array ou object)
-    stripped = val.strip
-    return val unless (stripped.start_with?("[") && stripped.end_with?("]")) ||
-                      (stripped.start_with?("{") && stripped.end_with?("}"))
-
-    begin
-      JSON.parse(val)
-    rescue JSON::ParserError
-      val
-    end
+  def needs_casket_default_array?(settings)
+    settings["validations"].any? { |rule| rule["type"] == "casket_value" && rule["match_c2_length"] }
   end
 end
