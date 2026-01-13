@@ -41,28 +41,28 @@
     "name": "CaseWeight",
     "validations": [
       { "type": "single_value" },
-      { "type": "match_pattern", "pattern": "^\\d+$" }
+      { "type": "match_pattern", "pattern_name": "numeric" }
     ]
   },
   "C7": {
     "name": "CaseLength",
     "validations": [
       { "type": "single_value" },
-      { "type": "match_pattern", "pattern": "^\\d+$" }
+      { "type": "match_pattern", "pattern_name": "numeric" }
     ]
   },
   "C8": {
     "name": "CaseWidth",
     "validations": [
       { "type": "single_value" },
-      { "type": "match_pattern", "pattern": "^\\d+$" }
+      { "type": "match_pattern", "pattern_name": "numeric" }
     ]
   },
   "C9": {
     "name": "CaseHeight",
     "validations": [
       { "type": "single_value" },
-      { "type": "match_pattern", "pattern": "^\\d+$" }
+      { "type": "match_pattern", "pattern_name": "numeric" }
     ]
   },
   "C10": {
@@ -93,7 +93,7 @@
     "name": "Degree",
     "validations": [
       { "type": "single_value" },
-      { "type": "match_pattern", "pattern": "^\\d+$" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -307,6 +307,10 @@
       {
         "type": "match_other_code_length",
         "source_code": "C26"
+      },
+      {
+        "type": "match_pattern",
+        "pattern_name": "year_yyyy"
       }
     ]
   },
@@ -370,6 +374,10 @@
       {
         "type": "casket_value",
         "match_c2_length": true
+      },
+      {
+        "type": "match_pattern",
+        "pattern_name": "date_yyyymmdd"
       }
     ]
   },
@@ -380,6 +388,10 @@
       {
         "type": "casket_value",
         "match_c2_length": true
+      },
+      {
+        "type": "match_pattern",
+        "pattern_name": "date_yyyymmdd"
       }
     ]
   },
@@ -397,7 +409,11 @@
         "type": "casket_value",
         "allowed_values": ["00"]
       },
-      { "type": "in_database" }
+      { "type": "in_database" },
+      {
+        "type": "match_pattern",
+        "pattern_name": "date_yyyymmdd"
+      }
     ]
   },
   "C37C": {
@@ -699,7 +715,7 @@
     "validations": [
       {
         "type": "match_pattern",
-        "pattern": "^https://"
+        "pattern_name": "url_https"
       }
     ]
   },
@@ -708,7 +724,7 @@
     "validations": [
       {
         "type": "match_pattern",
-        "pattern": "^https://"
+        "pattern_name": "url_https"
       }
     ]
   },
@@ -717,7 +733,7 @@
     "validations": [
       {
         "type": "match_pattern",
-        "pattern": "^https://"
+        "pattern_name": "url_https"
       }
     ]
   },
@@ -726,7 +742,7 @@
     "validations": [
       {
         "type": "match_pattern",
-        "pattern": "^https://"
+        "pattern_name": "url_https"
       }
     ]
   },
@@ -735,7 +751,7 @@
     "validations": [
       {
         "type": "match_pattern",
-        "pattern": "^https://"
+        "pattern_name": "url_https"
       }
     ]
   },
@@ -744,7 +760,7 @@
     "validations": [
       {
         "type": "match_pattern",
-        "pattern": "^https://"
+        "pattern_name": "url_https"
       }
     ]
   },
@@ -753,7 +769,7 @@
     "validations": [
       {
         "type": "match_pattern",
-        "pattern": "^https://"
+        "pattern_name": "url_https"
       }
     ]
   },
@@ -835,7 +851,7 @@
       { "type": "single_value" },
       {
         "type": "match_pattern",
-        "pattern": "^https://"
+        "pattern_name": "url_https"
       }
     ]
   },
