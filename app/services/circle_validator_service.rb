@@ -13,7 +13,6 @@ class CircleValidatorService
     "match_pattern"           => Validations::MatchPatternValidation,
     "match_other_code_length" => Validations::MatchOtherCodeLengthValidation,
     "duplicate_value"         => Validations::DuplicateValueValidation,
-    "numeric_value"           => Validations::NumericValueValidation,
     "in_database"             => Validations::InDatabaseValidation,
     "in_database_combination" => Validations::InDatabaseCombinationValidation,
     "product_validation"      => Validations::ProductValidation

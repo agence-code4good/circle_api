@@ -39,19 +39,31 @@
   },
   "C6": {
     "name": "CaseWeight",
-    "validations": [{ "type": "single_value" }, { "type": "numeric_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern": "^\\d+$" }
+    ]
   },
   "C7": {
     "name": "CaseLength",
-    "validations": [{ "type": "single_value" }, { "type": "numeric_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern": "^\\d+$" }
+    ]
   },
   "C8": {
     "name": "CaseWidth",
-    "validations": [{ "type": "single_value" }, { "type": "numeric_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern": "^\\d+$" }
+    ]
   },
   "C9": {
     "name": "CaseHeight",
-    "validations": [{ "type": "single_value" }, { "type": "numeric_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern": "^\\d+$" }
+    ]
   },
   "C10": {
     "name": "Product",
@@ -81,7 +93,7 @@
     "name": "Degree",
     "validations": [
       { "type": "single_value" },
-      { "type": "numeric_value", "casket_allowed": true },
+      { "type": "match_pattern", "pattern": "^\\d+$" },
       {
         "type": "casket_value",
         "match_c2_length": true
