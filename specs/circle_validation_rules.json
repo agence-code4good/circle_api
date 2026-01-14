@@ -544,9 +544,7 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       {
         "type": "casket_value",
@@ -656,9 +654,7 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       {
         "type": "casket_value",
@@ -993,9 +989,7 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       { "type": "single_value" },
       {
@@ -1009,16 +1003,17 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       { "type": "duplicate_value" },
       {
         "type": "casket_value",
         "allowed_values": ["00"]
       },
-      { "type": "in_database" }
+      {
+        "type": "in_database",
+        "filter_from_code": "C13"
+      }
     ]
   },
   "C79": {
@@ -1026,9 +1021,7 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       {
         "type": "in_database_combination",
@@ -1052,9 +1045,7 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       {
         "type": "in_database_combination",

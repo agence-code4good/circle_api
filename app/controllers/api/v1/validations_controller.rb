@@ -41,6 +41,7 @@ class Api::V1::ValidationsController < Api::BaseController
 
   def build_validation_results(circle_values, validation_errors)
     dictionary = Validations::BaseValidation.dictionary
+    validation_rules = load_validation_rules
     results = []
 
     # Créer un index basé sur l'ordre des clés dans le dictionnaire YAML
@@ -53,15 +54,8 @@ class Api::V1::ValidationsController < Api::BaseController
       # Récupérer le label depuis le dictionnaire
       label = dictionary_entry&.dig("label") || code_str
 
-      # Récupérer la valeur lisible :
-      # - cas général : via le dictionnaire (enum)
-      # - cas particulier C10 : via le label du produit
-      enum_value =
-        if code_str == "C10"
-          map_product_label_value(value)
-        else
-          map_enum_value(value, dictionary_entry)
-        end
+      # Récupérer la valeur lisible selon le type de code
+      enum_value = get_readable_value(code_str, value, dictionary, validation_rules)
 
       # Vérifier si ce code a des erreurs
       has_errors = validation_errors.key?(code_str)
@@ -109,5 +103,46 @@ class Api::V1::ValidationsController < Api::BaseController
   def product_label_for_code(code)
     product = Validations::BaseValidation.products_csv[code.to_s]
     product&.label || code.to_s
+  end
+
+  # Charge les règles de validation depuis le JSON
+  def load_validation_rules
+    @validation_rules ||= JSON.parse(
+      File.read(Rails.root.join("specs", "circle_validation_rules.json"))
+    )
+  end
+
+  # Détermine quelle entry du dictionnaire utiliser pour mapper les valeurs
+  def get_dictionary_entry_for_mapping(code_str, validation_rules, dictionary)
+    # Vérifier si ce code a une validation in_database avec filter_from_code
+    code_rules = validation_rules[code_str]
+
+    if code_rules && code_rules["validations"]
+      in_db_validation = code_rules["validations"].find do |rule|
+        rule["type"] == "in_database" && rule["filter_from_code"]
+      end
+
+      if in_db_validation
+        # Utiliser l'enum du code référencé
+        source_code = in_db_validation["filter_from_code"]
+        return dictionary[source_code]
+      end
+    end
+
+    # Sinon, utiliser l'enum du code lui-même
+    dictionary[code_str]
+  end
+
+  # Récupère la valeur lisible selon le type de code
+  def get_readable_value(code_str, value, dictionary, validation_rules)
+    case code_str
+    when "C10"
+      # Cas particulier : produits
+      map_product_label_value(value)
+    else
+      # Cas général : déterminer quel dictionnaire utiliser
+      dictionary_entry = get_dictionary_entry_for_mapping(code_str, validation_rules, dictionary)
+      map_enum_value(value, dictionary_entry)
+    end
   end
 end
