@@ -66,41 +66,29 @@ class Api::V1::CircleValuesController < Api::BaseController
       return
     end
 
-    # Charger les données depuis le fichier JSON (à remplacer par des requêtes en DB)
-    file_path = Rails.root.join("specs", "examples", "circle_data_example.json")
-    unless File.exist?(file_path)
-      render json: { error: "Fichier data.json non trouvé" }, status: :not_found
-      return
-    end
-
-    data = JSON.parse(File.read(file_path))
-
-    # Exclure CLE des input_values pour la recherche (la clé n'est pas utilisée pour trouver le hash)
+    # Exclure CLE des input_values pour la recherche (la clé n'est pas utilisée pour trouver le produit)
     search_input_values = input_values.except("CLE")
 
-    # Trouver le hash correspondant aux input_values (sans CLE)
-    matching_hash = data.find do |hash|
-      # Vérifier que tous les input_values correspondent (sans CLE)
-      search_input_values.all? do |key, value|
-        hash[key] == value.to_s
-      end
-    end
+    # Recherche en base de données
+    product = CircleProduct.find_by_input_codes(search_input_values)
 
-    unless matching_hash
-      render json: { error: "Aucune donnée trouvée pour les valeurs d'entrée" }, status: :bad_request
+    unless product
+      render json: { error: "Aucune donnée trouvée pour les valeurs d'entrée" }, status: :not_found
       return
     end
 
-    # Extraire les valeurs recherchées depuis le hash trouvé
+    # Extraire les codes demandés depuis la base de données
+    found_codes = product.circle_codes.where(code: searched_values)
+
     circle_values = {}
-    searched_values.each do |code|
-      if matching_hash.key?(code)
-        circle_values[code] = {
-          label: Validations::BaseValidation.dictionary[code]["label"],
-          value: matching_hash[code],
-          circle_value: Validations::BaseValidation.dictionary[code]["enum"][matching_hash[code]] || matching_hash[code]
-        }
-      end
+    found_codes.each do |circle_code|
+      value = circle_code.value
+
+      circle_values[circle_code.code] = {
+        label: Validations::BaseValidation.dictionary[circle_code.code]["label"],
+        value: value,
+        circle_value: Validations::BaseValidation.dictionary[circle_code.code]["enum"][value] || value
+      }
     end
 
     render json: { circle_values: circle_values }, status: :ok

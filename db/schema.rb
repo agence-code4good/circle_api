@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_140405) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_14_151307) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -38,6 +38,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_140405) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "circle_codes", force: :cascade do |t|
+    t.bigint "circle_product_id", null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "value", default: {}, null: false
+    t.index ["circle_product_id", "code"], name: "index_circle_codes_on_circle_product_id_and_code", unique: true
+    t.index ["circle_product_id"], name: "index_circle_codes_on_circle_product_id"
+    t.index ["code"], name: "index_circle_codes_on_code"
+    t.index ["value"], name: "index_circle_codes_on_value", using: :gin
+  end
+
+  create_table "circle_products", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "order_lines", force: :cascade do |t|
@@ -84,5 +101,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_140405) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "circle_codes", "circle_products"
   add_foreign_key "order_lines", "orders"
 end
