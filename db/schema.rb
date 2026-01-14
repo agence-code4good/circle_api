@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_10_130411) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_14_140405) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,16 +40,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_130411) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
-  create_table "identifier_pairs", force: :cascade do |t|
-    t.boolean "active"
-    t.datetime "created_at", null: false
-    t.string "my_alias"
-    t.string "partner_alias"
-    t.bigint "partner_id", null: false
-    t.datetime "updated_at", null: false
-    t.index ["partner_id"], name: "index_identifier_pairs_on_partner_id"
-  end
-
   create_table "order_lines", force: :cascade do |t|
     t.jsonb "circle_code"
     t.datetime "created_at", null: false
@@ -67,6 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_130411) do
     t.date "latest_instruction_due_date"
     t.string "note"
     t.string "order_reference"
+    t.integer "previous_status"
     t.string "seller_id"
     t.integer "status"
     t.datetime "updated_at", null: false
@@ -93,6 +84,5 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_130411) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
-  add_foreign_key "identifier_pairs", "partners"
   add_foreign_key "order_lines", "orders"
 end

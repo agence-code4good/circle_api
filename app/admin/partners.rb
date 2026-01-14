@@ -30,17 +30,6 @@ ActiveAdmin.register Partner do
       row :created_at
       row :updated_at
     end
-
-    panel "Identifier Pairs" do
-      table_for resource.identifier_pairs do
-        column :id
-        column :my_alias
-        column :partner_alias
-        column :active
-        column :created_at
-        column :updated_at
-      end
-    end
   end
 
   form do |f|
