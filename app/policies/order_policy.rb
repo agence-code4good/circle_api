@@ -6,6 +6,7 @@ class OrderPolicy < ApplicationPolicy
     demande_de_mise_et_logistique_en_cours
     details_de_mise_et_logistique_confirmes
     commande_cloturee
+    annulee_acheteur
   ].freeze
 
   SELLER_ONLY = %w[
@@ -13,6 +14,7 @@ class OrderPolicy < ApplicationPolicy
     bon_de_commande
     mise_a_disposition
     bon_de_livraison
+    annulee_vendeur
   ].freeze
 
   # Statuts où les order_lines ne sont plus modifiables par personne
@@ -60,6 +62,30 @@ class OrderPolicy < ApplicationPolicy
   # Vérifie que le statut demandé est autorisé pour le rôle de l'utilisateur
   # to_status: String (ex: "bon_de_commande")
   def allowed_status?(to_status)
+    return false unless record && user.is_a?(Partner)
+    
+    current_status = record.status.to_s
+    
+    # Logique spéciale pour l'annulation finale "annulee"
+    if to_status == "annulee"
+      # Depuis annulee_acheteur, seul le seller peut confirmer
+      return actor_role == :seller if current_status == "annulee_acheteur"
+      # Depuis annulee_vendeur, seul le buyer peut confirmer
+      return actor_role == :buyer if current_status == "annulee_vendeur"
+      # Sinon, personne ne peut directement passer à "annulee"
+      return false
+    end
+    
+    # Logique pour le retour au statut précédent depuis annulee_acheteur ou annulee_vendeur
+    if current_status.in?(%w[annulee_acheteur annulee_vendeur])
+      # Les deux parties peuvent revenir au statut précédent
+      if record.previous_status.present?
+        previous_status_key = Order.statuses.key(record.previous_status)
+        return true if to_status == previous_status_key && (actor_role == :buyer || actor_role == :seller)
+      end
+    end
+    
+    # Vérifier que le statut demandé est dans la liste autorisée pour le rôle
     case actor_role
     when :buyer  then BUYER_ONLY.include?(to_status)
     when :seller then SELLER_ONLY.include?(to_status)
@@ -71,15 +97,9 @@ class OrderPolicy < ApplicationPolicy
   def actor_role
     return nil unless user.is_a?(Partner) && record
 
-    buyer_id = record.buyer_id
-    return nil unless buyer_id
-
-    buyer_partner = buyer_partner_for(buyer_id)
-    return nil unless buyer_partner
-
-    if buyer_partner == user
+    if record.buyer_id == user.code
       :buyer
-    elsif record.seller_id && seller_partner_for(record.seller_id) == user
+    elsif record.seller_id == user.code
       :seller
     else
       nil
@@ -90,39 +110,6 @@ class OrderPolicy < ApplicationPolicy
     def resolve
       # Filtrer les commandes visibles par l'utilisateur authentifié'
       scope
-    end
-  end
-
-  private
-
-  # Détermine le partner buyer à partir d'un buyer_id
-  # Si buyer_id correspond à partner_alias, retourne le partner de l'identifier_pair
-  # Si buyer_id correspond à my_alias, retourne le partner Circle (main_partner)
-  def buyer_partner_for(buyer_id)
-    return nil unless buyer_id
-
-    identifier_pair = IdentifierPair.find_by(partner_alias: buyer_id) || IdentifierPair.find_by(my_alias: buyer_id)
-    return nil unless identifier_pair
-
-    if identifier_pair.partner_alias == buyer_id
-      identifier_pair.partner
-    else
-      Partner.main_partner
-    end
-  end
-
-  # Détermine le partner seller à partir d'un seller_id
-  # Même logique que pour le buyer
-  def seller_partner_for(seller_id)
-    return nil unless seller_id
-
-    identifier_pair = IdentifierPair.find_by(partner_alias: seller_id) || IdentifierPair.find_by(my_alias: seller_id)
-    return nil unless identifier_pair
-
-    if identifier_pair.partner_alias == seller_id
-      identifier_pair.partner
-    else
-      Partner.main_partner
     end
   end
 end

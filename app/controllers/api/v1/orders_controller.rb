@@ -16,7 +16,6 @@ class Api::V1::OrdersController < Api::BaseController
       render json: { error: "Invalid status for new order. Must be 'nouvelle_commande'" }, status: :unprocessable_entity
       return
     end
-
     if order.save
       @order = order
       render json: { order: @order }, status: :created

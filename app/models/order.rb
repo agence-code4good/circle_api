@@ -11,8 +11,8 @@ class Order < ApplicationRecord
             format: { with: URI::DEFAULT_PARSER.make_regexp(%w[https]), message: "doit être une url https valide" },
             allow_blank: true
 
-  validate :latest_instruction_due_date_must_be_future_or_today
-  validate :estimated_availability_earliest_at_must_be_future_or_today
+  validate :latest_instruction_due_date_must_be_future_or_today, on: :create
+  validate :estimated_availability_earliest_at_must_be_future_or_today, on: :create
   validate :status_must_be_nouvelle_commande_on_create, on: :create
   validate :total_volume_cannot_change_on_update, on: :update
   validate :order_reference_cannot_change_on_update, on: :update
@@ -26,9 +26,9 @@ class Order < ApplicationRecord
   attr_accessor :original_volumes_by_group
 
   before_validation :store_original_total_volume, on: :update, prepend: true
+  before_save :store_previous_status_on_status_change
 
   enum :status, {
-    annulee: 0,
     nouvelle_commande: 1,
     en_attente_demande_de_mise: 2,
     demande_de_mise_et_logistique_en_cours: 3,
@@ -36,17 +36,24 @@ class Order < ApplicationRecord
     bon_de_commande: 5,
     mise_a_disposition: 6,
     bon_de_livraison: 7,
-    commande_cloturee: 8
+    commande_cloturee: 8,
+    annulee_acheteur: 9,
+    annulee_vendeur: 10,
+    annulee: 11
   }
 
   ALLOWED_TRANSITIONS = {
-    "nouvelle_commande"                       => %w[en_attente_demande_de_mise],
-    "en_attente_demande_de_mise"             => %w[demande_de_mise_et_logistique_en_cours details_de_mise_et_logistique_confirmes],
-    "demande_de_mise_et_logistique_en_cours" => %w[details_de_mise_et_logistique_confirmes],
-    "details_de_mise_et_logistique_confirmes"=> %w[bon_de_commande],
-    "bon_de_commande"                         => %w[mise_a_disposition],
-    "mise_a_disposition"                      => %w[bon_de_livraison],
-    "bon_de_livraison"                        => %w[commande_cloturee]
+    "nouvelle_commande"                       => %w[en_attente_demande_de_mise annulee_acheteur annulee_vendeur],
+    "en_attente_demande_de_mise"             => %w[demande_de_mise_et_logistique_en_cours details_de_mise_et_logistique_confirmes annulee_acheteur annulee_vendeur],
+    "demande_de_mise_et_logistique_en_cours" => %w[details_de_mise_et_logistique_confirmes annulee_acheteur annulee_vendeur],
+    "details_de_mise_et_logistique_confirmes"=> %w[bon_de_commande annulee_acheteur annulee_vendeur],
+    "bon_de_commande"                         => %w[mise_a_disposition annulee_acheteur annulee_vendeur],
+    "mise_a_disposition"                      => %w[bon_de_livraison annulee_acheteur annulee_vendeur],
+    "bon_de_livraison"                        => %w[commande_cloturee annulee_acheteur annulee_vendeur],
+    "annulee_acheteur"                        => %w[annulee],
+    "annulee_vendeur"                         => %w[annulee],
+    "commande_cloturee"                       => [],
+    "annulee"                                 => []
   }.freeze
 
   ## Ransackable attributes pour la recherche dans l'admin ##
@@ -97,15 +104,30 @@ class Order < ApplicationRecord
 
   # Vérifie si une transition de statut est autorisée
   def allowed_transition?(to_status, from_status: nil)
-    # Une commande peut toujours être annulée, quel que soit son statut actuel
-    return true if to_status.to_s == "annulee"
-
     from_status ||= status.to_s
+    
+    # Gérer le retour au statut précédent depuis annulee_acheteur ou annulee_vendeur
+    if (from_status == "annulee_acheteur" || from_status == "annulee_vendeur") && 
+       previous_status.present?
+      previous_status_key = Order.statuses.key(previous_status)
+      return true if to_status == previous_status_key
+    end
+    
+    # Vérifier les transitions autorisées dans la map
     allowed = ALLOWED_TRANSITIONS.fetch(from_status, [])
     allowed.include?(to_status.to_s)
   end
 
   private
+
+  # Sauvegarde systématiquement le statut précédent à chaque changement de statut
+  def store_previous_status_on_status_change
+    return if new_record?  # Pas de previous_status pour une nouvelle commande
+    return unless status_changed?  # Seulement si le statut change
+    
+    # Sauvegarder le statut précédent
+    self.previous_status = Order.statuses[status_was]
+  end
 
   def store_original_total_volume
     return if new_record?

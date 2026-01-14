@@ -4,6 +4,5 @@ User.create!(admin: true, email: "dev@code4good.fr", password: 'macpass', passwo
 # partners
 Partner.create!(name: "Code4Good", code: "code4good")
 Partner.create!(name: "Circle", code: "circle")
-
-# identifier pairs
-IdentifierPair.create!(partner: Partner.find_by(code: "code4good"), my_alias: "c_1234567890", partner_alias: "p_1234567890")
+Partner.create!(name: "Château Gazin", code: "chateau_gazin")
+Partner.create!(name: "La Cave à Part", code: "la_cave_a_part")
