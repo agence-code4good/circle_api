@@ -16,6 +16,10 @@ class Api::V1::ValidationsController < Api::BaseController
     circle_code_results = build_validation_results(circle_values, validation_errors)
 
     # Construire la réponse finale selon qu'il y a des erreurs ou non
+    # Exposer les variables pour le logging
+    @validation_success = validation_errors.empty?
+    @validation_errors = validation_errors unless @validation_success
+    
     if validation_errors.empty?
       # Calculer la clé Circle si pas d'erreur
       circle_key = CircleKeyCalculatorService.new(circle_values).calculate

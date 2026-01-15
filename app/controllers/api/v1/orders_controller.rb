@@ -3,24 +3,23 @@ class Api::V1::OrdersController < Api::BaseController
   rescue_from ArgumentError, with: :handle_enum_argument_error
 
   def create
-    order = Order.new(order_params)
+    @order = Order.new(order_params)
 
-    policy = OrderPolicy.new(@current_partner, order)
+    policy = OrderPolicy.new(@current_partner, @order)
     unless policy.create?
       render json: { error: "Forbidden : You must be the buyer to create an order" }, status: :forbidden
       return
     end
 
-    status_string = order.status.to_s
+    status_string = @order.status.to_s
     unless status_string == "nouvelle_commande"
       render json: { error: "Invalid status for new order. Must be 'nouvelle_commande'" }, status: :unprocessable_entity
       return
     end
-    if order.save
-      @order = order
+    if @order.save
       render json: { order: @order }, status: :created
     else
-      render json: { errors: format_errors(order) }, status: :unprocessable_entity
+      render json: { errors: format_errors(@order) }, status: :unprocessable_entity
     end
   end
 

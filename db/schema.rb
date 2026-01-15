@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_151307) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_15_133755) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -38,6 +38,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_151307) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "api_logs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "duration_ms"
+    t.string "endpoint", null: false
+    t.text "error_backtrace"
+    t.text "error_message"
+    t.string "http_method", null: false
+    t.inet "ip_address"
+    t.bigint "order_id"
+    t.bigint "partner_id"
+    t.string "path"
+    t.text "request_body"
+    t.jsonb "request_headers", default: {}
+    t.string "request_id", null: false
+    t.jsonb "request_params", default: {}
+    t.jsonb "response_body"
+    t.integer "status_code"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.jsonb "validation_errors"
+    t.boolean "validation_success"
+    t.index ["created_at"], name: "index_api_logs_on_created_at"
+    t.index ["endpoint", "created_at"], name: "index_api_logs_on_endpoint_and_created_at"
+    t.index ["order_id"], name: "index_api_logs_on_order_id"
+    t.index ["partner_id", "created_at"], name: "index_api_logs_on_partner_id_and_created_at"
+    t.index ["partner_id"], name: "index_api_logs_on_partner_id"
+    t.index ["request_id"], name: "index_api_logs_on_request_id"
+    t.index ["status_code"], name: "index_api_logs_on_status_code"
+    t.index ["validation_success"], name: "index_api_logs_on_validation_success"
   end
 
   create_table "circle_codes", force: :cascade do |t|
@@ -101,6 +132,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_151307) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "api_logs", "orders"
+  add_foreign_key "api_logs", "partners"
   add_foreign_key "circle_codes", "circle_products"
   add_foreign_key "order_lines", "orders"
 end

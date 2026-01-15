@@ -1,4 +1,6 @@
 class Api::BaseController < ActionController::API
+  include ApiLoggable
+  
   # Désactive la protection CSRF pour les endpoints API
 
   private
