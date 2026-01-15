@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       post "validation", to: "validations#validate"
 
       # Commandes
-      resources :orders, only: [ :create, :update, :show, :index ]
+      resources :orders, only: [ :create, :update ]
 
       # Catalogue produits (lecture seule)
       resources :products, only: [ :index, :show ], param: :c10

@@ -5,7 +5,7 @@ class SwaggerUiController < ApplicationController
 
   def index
     @config_object = {
-      url: "/specs/openapi.yaml",
+      url: "/openai/openapi.yaml",
       dom_id: "#swagger-ui",
       validatorUrl: nil
     }
