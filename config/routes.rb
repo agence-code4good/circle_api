@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   ActiveAdmin.routes(self) rescue ActiveAdmin::DatabaseHitDuringLoad
   devise_for :users
 
+  get "/api-docs", to: "swagger_ui#index"
+
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       # Validation "à blanc" (sans commande associée)
