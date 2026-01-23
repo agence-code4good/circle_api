@@ -1,31 +1,31 @@
 # # code4good user
 
-# puts "Création de l'utilisateur admin..."
+puts "Création de l'utilisateur admin..."
 
-# User.destroy_all
+User.destroy_all
 
-# User.create!(admin: true, email: "dev@code4good.fr", password: 'macpass', password_confirmation: 'macpass')
+User.create!(admin: true, email: "dev@langagecircle.fr", password: 'LangageCircle2026!', password_confirmation: 'macpass')
 
-# puts "Utilisateur admin créé"
+puts "Utilisateur admin créé"
 
-# puts "Suppression des commandes..."
+puts "Suppression des commandes..."
 
-# Order.destroy_all
+Order.destroy_all
 
-# puts "Commandes supprimées"
+puts "Commandes supprimées"
 
-# # partners
+# partners
 
-# puts "Création des partenaires..."
+puts "Création des partenaires..."
 
-# Partner.destroy_all
+Partner.destroy_all
 
-# Partner.create!(name: "Code4Good", code: "code4good")
-# Partner.create!(name: "Circle", code: "circle")
-# Partner.create!(name: "Château Gazin", code: "chateau_gazin")
-# Partner.create!(name: "La Cave à Part", code: "la_cave_a_part")
+Partner.create!(name: "Code4Good", code: "code4good")
+Partner.create!(name: "Circle", code: "circle")
+Partner.create!(name: "Château Gazin", code: "chateau_gazin")
+Partner.create!(name: "La Cave à Part", code: "la_cave_a_part")
 
-# puts "Partenaires créés"
+puts "Partenaires créés"
 
 # circle products
 

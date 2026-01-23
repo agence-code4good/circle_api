@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: circle_api_db
+    environment:
+      POSTGRES_USER: circle_api
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-circle_api_password}
+      POSTGRES_DB: circle_api_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U circle_api -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - circle_api_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: circle_api_app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Master key Rails (générée via: docker compose run --rm app bin/rails credentials:edit)
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY:-}
+      # Base de données
+      - DATABASE_URL=postgres://circle_api:${DB_PASSWORD:-circle_api_password}@db:5432/circle_api_development
+      - RAILS_ENV=development
+      # Logs
+      - RAILS_LOG_LEVEL=${RAILS_LOG_LEVEL:-debug}
+      # Éditeur pour rails credentials:edit
+      - EDITOR=vi
+    ports:
+      - "${APP_PORT:-3000}:80"
+    volumes:
+      - .:/rails
+      - circle_api_storage:/rails/storage
+      - bundle_cache:/usr/local/bundle
+    restart: unless-stopped
+    networks:
+      - circle_api_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  circle_api_storage:
+    driver: local
+  bundle_cache:
+    driver: local
+
+networks:
+  circle_api_network:
+    driver: bridge

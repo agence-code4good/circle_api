@@ -20,9 +20,13 @@
 
 /public/assets
 
+# Node modules
+node_modules/
+
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 .env*
+!.env.example
 
 # Ignore cursor rules
 /.cursor/*
@@ -38,3 +42,6 @@
 
 # Ignore .DS_Store
 .DS_Store
+# Ignore key files for decrypting credentials and more.
+/config/*.key
+
