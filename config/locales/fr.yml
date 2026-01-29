@@ -3,6 +3,20 @@ fr:
     errors:
       messages:
         blank: "ne peut pas être vide"
+        taken: "est déjà utilisé"
+        invalid: "n'est pas valide"
+        too_long: "est trop long"
+        too_short: "est trop court"
+        wrong_length: "est de la mauvaise longueur"
+        not_a_number: "n'est pas un nombre"
+        not_an_integer: "n'est pas un entier"
+        not_a_date: "n'est pas une date"
+        not_a_time: "n'est pas une heure"
+        not_a_boolean: "n'est pas un booléen"
+        not_a_string: "n'est pas une chaîne de caractères"
+        not_a_hash: "n'est pas un hash"
+        not_a_array: "n'est pas un array"
+        not_a_symbol: "n'est pas un symbole"
   date:
     formats:
       default: "%d/%m/%Y"

@@ -4,7 +4,7 @@ puts "Création de l'utilisateur admin..."
 
 User.destroy_all
 
-User.create!(admin: true, email: "dev@langagecircle.fr", password: 'LangageCircle2026!', password_confirmation: 'LangageCircle2026!')
+user = User.create!(admin: true, email: "dev@langagecircle.fr", password: 'LangageCircle2026!', password_confirmation: 'LangageCircle2026!')
 
 puts "Utilisateur admin créé"
 
@@ -21,6 +21,7 @@ puts "Création des partenaires..."
 Partner.destroy_all
 
 Partner.create!(name: "Code4Good", code: "code4good")
+user.update!(partner: Partner.find_by(code: "code4good"))
 Partner.create!(name: "Circle", code: "circle")
 Partner.create!(name: "Château Gazin", code: "chateau_gazin")
 Partner.create!(name: "La Cave à Part", code: "la_cave_a_part")

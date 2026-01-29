@@ -29,4 +29,16 @@ class OrderLine < ApplicationRecord
       nil
     end
   end
+
+  ## Pour la création des order_lines via ActiveAdmin (entrée JSON)
+  def circle_code_json
+    circle_code.present? ? JSON.pretty_generate(circle_code) : ""
+  end
+
+  def circle_code_json=(value)
+    return if value.blank?
+    self.circle_code = JSON.parse(value)
+  rescue JSON::ParserError
+    errors.add(:circle_code, "n'est pas un JSON valide")
+  end
 end

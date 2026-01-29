@@ -1,6 +1,8 @@
 class Partner < ApplicationRecord
   has_secure_token :auth_token
 
+  has_many :users, dependent: :nullify
+
   def self.main_partner
     find_by(code: "circle")
   end

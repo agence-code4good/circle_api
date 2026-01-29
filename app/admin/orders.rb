@@ -1,5 +1,10 @@
 ActiveAdmin.register Order do
-  permit_params :buyer_id, :note, :order_reference, :seller_id, :status
+  permit_params :order_reference, :initial_order_reference,
+  :buyer_id, :seller_id, :note, :status,
+  :accompanying_document_url,
+  :latest_instruction_due_date,
+  :estimated_availability_earliest_at,
+  order_lines_attributes: [ :id, :_destroy, :circle_code_json ]
 
   actions :all, except: []
 
@@ -52,13 +57,28 @@ ActiveAdmin.register Order do
 
   form do |f|
     f.semantic_errors(*f.object.errors.attribute_names)
-    f.inputs do
-      f.input :buyer_id
-      f.input :note
+
+    f.inputs "Commande" do
+      f.input :buyer_id,  as: :select, collection: Partner.all.map { |p| [ "#{p.name} (#{p.code})", p.code ] }
+      f.input :seller_id, as: :select, collection: Partner.all.map { |p| [ "#{p.name} (#{p.code})", p.code ] }
       f.input :order_reference
-      f.input :seller_id
-      f.input :status
+      f.input :note
+      f.input :status, as: :select, collection: Order.statuses.keys
+      f.input :accompanying_document_url
+      f.input :latest_instruction_due_date, as: :date_select
+      f.input :estimated_availability_earliest_at, as: :date_select
     end
+
+    f.inputs "Lignes de commande" do
+      f.has_many :order_lines, allow_destroy: true, new_record: "Ajouter une ligne" do |line|
+        line.input :circle_code_json,
+                   as: :text,
+                   label: "Circle code (JSON)",
+                   hint: 'Coller le JSON, ex: { "C0": "11", "CLE": "055", "C1": "A0", "C2": "6", "C3": "A1", "C4": "A0", "C5": "00", "C10": "5238A0", "C11": "2017", "C13": "A7", "C31": "6" }',
+                   input_html: { rows: 6 }
+      end
+    end
+
     f.actions
   end
 end
