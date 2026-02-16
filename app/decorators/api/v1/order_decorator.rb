@@ -9,5 +9,4 @@ class Api::V1::OrderDecorator < Draper::Decorator
   #       object.created_at.strftime("%a %m/%d/%y")
   #     end
   #   end
-
 end

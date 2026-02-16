@@ -17,7 +17,7 @@ module CircleApi
       ErrorsController.action(:show).call(env)
     }
     config.i18n.default_locale = :fr
-    config.i18n.available_locales = ["fr"]
+    config.i18n.available_locales = [ "fr" ]
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 

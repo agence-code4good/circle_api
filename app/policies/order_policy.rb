@@ -63,9 +63,9 @@ class OrderPolicy < ApplicationPolicy
   # to_status: String (ex: "bon_de_commande")
   def allowed_status?(to_status)
     return false unless record && user.is_a?(Partner)
-    
+
     current_status = record.status.to_s
-    
+
     # Logique spéciale pour l'annulation finale "annulee"
     if to_status == "annulee"
       # Depuis annulee_acheteur, seul le seller peut confirmer
@@ -75,7 +75,7 @@ class OrderPolicy < ApplicationPolicy
       # Sinon, personne ne peut directement passer à "annulee"
       return false
     end
-    
+
     # Logique pour le retour au statut précédent depuis annulee_acheteur ou annulee_vendeur
     if current_status.in?(%w[annulee_acheteur annulee_vendeur])
       # Les deux parties peuvent revenir au statut précédent
@@ -84,7 +84,7 @@ class OrderPolicy < ApplicationPolicy
         return true if to_status == previous_status_key && (actor_role == :buyer || actor_role == :seller)
       end
     end
-    
+
     # Vérifier que le statut demandé est dans la liste autorisée pour le rôle
     case actor_role
     when :buyer  then BUYER_ONLY.include?(to_status)

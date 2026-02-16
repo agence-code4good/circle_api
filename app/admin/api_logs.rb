@@ -1,21 +1,21 @@
 ActiveAdmin.register ApiLog do
   menu priority: 2, label: "Logs API"
-  
+
   # Configuration
   config.per_page = 50
   config.sort_order = "created_at_desc"
-  
+
   # Filtres
   filter :partner
   filter :order
   filter :endpoint, as: :select, collection: -> { ApiLog.distinct.pluck(:endpoint).compact.sort }
   filter :http_method, as: :select, collection: %w[GET POST PATCH PUT DELETE]
   filter :status_code
-  filter :validation_success, as: :select, collection: [["Succès", true], ["Échec", false]]
+  filter :validation_success, as: :select, collection: [ [ "Succès", true ], [ "Échec", false ] ]
   filter :created_at
   filter :request_id
   filter :ip_address
-  
+
   # Scope tabs
   scope :all, default: true
   scope("Aujourd'hui") { |scope| scope.today }
@@ -27,11 +27,11 @@ ActiveAdmin.register ApiLog do
   scope("Validations", &:validations)
   scope("Commandes", &:orders_api)
   scope("Produits", &:products_api)
-  
+
   # Index
   index do
     selectable_column
-    
+
     column "Date", :created_at, sortable: :created_at do |log|
       div do
         div l(log.created_at, format: :short)
@@ -40,15 +40,15 @@ ActiveAdmin.register ApiLog do
         end
       end
     end
-    
+
     column "Endpoint", sortable: :endpoint do |log|
       status_tag log.endpoint_name, class: log.success? ? "ok" : "error"
     end
-    
+
     column "Méthode", :http_method, sortable: :http_method do |log|
       status_tag log.http_method, class: log.http_method_color
     end
-    
+
     column "Partenaire", :partner, sortable: "partners.code" do |log|
       if log.partner
         link_to log.partner.code, admin_partner_path(log.partner)
@@ -56,7 +56,7 @@ ActiveAdmin.register ApiLog do
         span "-", style: "color: #999;"
       end
     end
-    
+
     column "Commande", :order do |log|
       if log.order
         link_to log.order.order_reference, admin_order_path(log.order)
@@ -64,19 +64,19 @@ ActiveAdmin.register ApiLog do
         span "-", style: "color: #999;"
       end
     end
-    
+
     column "Status", :status_code, sortable: :status_code do |log|
       status_tag log.status_code, class: log.status_color
     end
-    
+
     column "Durée", :duration_ms, sortable: :duration_ms do |log|
       if log.duration_ms
         duration = log.duration_ms.to_i
         color = case duration
-                when 0..100 then "green"
-                when 101..500 then "orange"
-                else "red"
-                end
+        when 0..100 then "green"
+        when 101..500 then "orange"
+        else "red"
+        end
         span style: "color: #{color}; font-weight: bold;" do
           "#{duration} ms"
         end
@@ -84,7 +84,7 @@ ActiveAdmin.register ApiLog do
         "-"
       end
     end
-    
+
     column "Validation" do |log|
       if log.validation_success.nil?
         "-"
@@ -94,10 +94,10 @@ ActiveAdmin.register ApiLog do
         status_tag "✗", class: "error"
       end
     end
-    
+
     actions
   end
-  
+
   # Show
   show do
     attributes_table do
@@ -107,7 +107,7 @@ ActiveAdmin.register ApiLog do
       end
       row :request_id
     end
-    
+
     panel "Partenaire & Commande" do
       attributes_table_for api_log do
         row :partner do |log|
@@ -131,7 +131,7 @@ ActiveAdmin.register ApiLog do
         end
       end
     end
-    
+
     panel "Requête" do
       attributes_table_for api_log do
         row :http_method do |log|
@@ -176,7 +176,7 @@ ActiveAdmin.register ApiLog do
         end
       end
     end
-    
+
     panel "Réponse" do
       attributes_table_for api_log do
         row :status_code do |log|
@@ -186,10 +186,10 @@ ActiveAdmin.register ApiLog do
           if log.duration_ms
             duration = log.duration_ms.to_i
             color = case duration
-                    when 0..100 then "green"
-                    when 101..500 then "orange"
-                    else "red"
-                    end
+            when 0..100 then "green"
+            when 101..500 then "orange"
+            else "red"
+            end
             span style: "color: #{color}; font-weight: bold; font-size: 16px;" do
               "#{duration} ms (#{log.duration_seconds} s)"
             end
@@ -208,7 +208,7 @@ ActiveAdmin.register ApiLog do
         end
       end
     end
-    
+
     if api_log.error_message.present?
       panel "Erreur", class: "error" do
         attributes_table_for api_log do
@@ -229,7 +229,7 @@ ActiveAdmin.register ApiLog do
         end
       end
     end
-    
+
     if api_log.validation_errors.present?
       panel "Erreurs de validation" do
         attributes_table_for api_log do
@@ -245,7 +245,7 @@ ActiveAdmin.register ApiLog do
       end
     end
   end
-  
+
   # Pas de création/modification manuelle
   config.clear_action_items!
   actions :index, :show

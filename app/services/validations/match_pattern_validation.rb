@@ -29,8 +29,8 @@ module Validations
       error_template = pattern_config[:error_message]
 
       regex = Regexp.new(pattern)
-      values = value.is_a?(Array) ? value : [value]
-      
+      values = value.is_a?(Array) ? value : [ value ]
+
       values.each do |v|
         unless v =~ regex || v == "00"
           return "Le champ #{code} #{error_template}, valeur reçue : '#{v}'."
@@ -50,11 +50,11 @@ module Validations
       if rule["pattern_name"]
         pattern_name = rule["pattern_name"]
         config = COMMON_PATTERNS[pattern_name]
-        
+
         unless config
           raise "Pattern inconnu : '#{pattern_name}'. Patterns disponibles : #{COMMON_PATTERNS.keys.join(', ')}"
         end
-        
+
         return config
       end
 
