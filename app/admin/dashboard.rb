@@ -12,7 +12,7 @@ ActiveAdmin.register_page "Dashboard" do
         errors: ApiLog.today.errors.count,
         avg_duration: ApiLog.today.average(:duration_ms)&.round(2)
       }
-      
+
       div style: "display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px;" do
         div style: "text-align: center;" do
           div style: "font-size: 14px; color: #666; margin-bottom: 5px;" do
@@ -22,7 +22,7 @@ ActiveAdmin.register_page "Dashboard" do
             stats[:total].to_s
           end
         end
-        
+
         div style: "text-align: center;" do
           div style: "font-size: 14px; color: #666; margin-bottom: 5px;" do
             "Succès"
@@ -31,7 +31,7 @@ ActiveAdmin.register_page "Dashboard" do
             stats[:success].to_s
           end
         end
-        
+
         div style: "text-align: center;" do
           div style: "font-size: 14px; color: #666; margin-bottom: 5px;" do
             "Erreurs"
@@ -40,7 +40,7 @@ ActiveAdmin.register_page "Dashboard" do
             stats[:errors].to_s
           end
         end
-        
+
         div style: "text-align: center;" do
           div style: "font-size: 14px; color: #666; margin-bottom: 5px;" do
             "Durée moy."
@@ -48,10 +48,10 @@ ActiveAdmin.register_page "Dashboard" do
           if stats[:avg_duration]
             avg = stats[:avg_duration].to_f
             color = case avg
-                    when 0..100 then "#28a745"
-                    when 101..500 then "#ffc107"
-                    else "#dc3545"
-                    end
+            when 0..100 then "#28a745"
+            when 101..500 then "#ffc107"
+            else "#dc3545"
+            end
             div style: "font-size: 32px; font-weight: bold; color: #{color};" do
               "#{avg.round(2)} ms"
             end
@@ -63,7 +63,7 @@ ActiveAdmin.register_page "Dashboard" do
         end
       end
     end
-    
+
     # Ligne 1 : Endpoints + Dernières commandes
     div style: "display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;" do
       div do
@@ -73,7 +73,7 @@ ActiveAdmin.register_page "Dashboard" do
                        .count
                        .sort_by { |_, count| -count }
                        .first(10)
-          
+
           if logs.any?
             table_for logs, class: "index_table" do
               column("Endpoint") { |endpoint, _| code endpoint }
@@ -87,7 +87,7 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
       end
-      
+
       div do
         panel "Dernières commandes" do
           orders = Order.order(created_at: :desc).limit(5)
@@ -103,13 +103,13 @@ ActiveAdmin.register_page "Dashboard" do
         end
       end
     end
-    
+
     # Ligne 2 : Erreurs + Validations
     div style: "display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;" do
       div do
         panel "Dernières erreurs" do
           errors = ApiLog.errors.recent.limit(10)
-          
+
           if errors.any?
             table_for errors, class: "index_table" do
               column("Date") { |log| "il y a #{time_ago_in_words(log.created_at)}" }
@@ -130,21 +130,21 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
       end
-      
+
       div do
         panel "Validations (aujourd'hui)" do
           validations = ApiLog.today.validations
           total = validations.count
           success = validations.where(validation_success: true).count
           failed = validations.where(validation_success: false).count
-          
+
           if total > 0
             div style: "padding: 20px; text-align: center;" do
               div style: "margin-bottom: 20px;" do
                 span "Total: ", style: "font-size: 14px; color: #666;"
                 strong total.to_s, style: "font-size: 24px;"
               end
-              
+
               div style: "display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;" do
                 div do
                   status_tag "#{success} succès", class: "ok"
@@ -153,7 +153,7 @@ ActiveAdmin.register_page "Dashboard" do
                   status_tag "#{failed} échecs", class: "error"
                 end
               end
-              
+
               div do
                 success_rate = (success.to_f / total * 100).round(1)
                 color = success_rate > 90 ? "#28a745" : success_rate > 70 ? "#ffc107" : "#dc3545"
@@ -167,7 +167,7 @@ ActiveAdmin.register_page "Dashboard" do
         end
       end
     end
-    
+
     # Ligne 3 : Top partenaires
     div style: "margin-top: 20px;" do
       panel "Top 5 partenaires (cette semaine)" do
@@ -177,7 +177,7 @@ ActiveAdmin.register_page "Dashboard" do
                               .count
                               .sort_by { |_, count| -count }
                               .first(5)
-        
+
         if partner_stats.any?
           table_for partner_stats, class: "index_table" do
             column("Partenaire") { |code, _| link_to code, admin_partner_path(Partner.find_by(code: code)) }

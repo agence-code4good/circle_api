@@ -17,7 +17,7 @@ module Validations
       position_value = value[position_index]
 
       # Si c'est un array (ex: C5), vérifier chaque élément
-      values_to_check = position_value.is_a?(Array) ? position_value : [position_value]
+      values_to_check = position_value.is_a?(Array) ? position_value : [ position_value ]
 
       values_to_check.each do |v|
         unless allowed_vals.include?(v)

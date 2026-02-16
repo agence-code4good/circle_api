@@ -8,13 +8,13 @@ module Validations
       return nil unless casket_mode?
 
       forbidden = rule["forbidden_values"] || []
-      values = value.is_a?(Array) ? value : [value]
-      
+      values = value.is_a?(Array) ? value : [ value ]
+
       violating = values.select { |v| forbidden.include?(v) }
       unless violating.empty?
         return "En mode coffret, #{code} ne peut pas contenir les valeurs #{forbidden.join(', ')} (valeurs trouvées : #{violating.join(', ')})."
       end
-      
+
       nil
     end
 

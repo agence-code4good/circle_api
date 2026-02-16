@@ -1,5 +1,6 @@
 class Order < ApplicationRecord
   has_many :order_lines, dependent: :destroy
+  has_many :api_logs, dependent: :destroy
   validates :buyer_id, presence: true
   validates :seller_id, presence: true
   validates :order_reference, presence: true
@@ -19,8 +20,9 @@ class Order < ApplicationRecord
   validate :status_is_valid
   validate :status_transition_is_allowed, on: :update
   validate :initial_order_reference_exists
+  validate :buyer_and_seller_cannot_change_on_update, on: :update
 
-  accepts_nested_attributes_for :order_lines
+  accepts_nested_attributes_for :order_lines, allow_destroy: true
 
   attr_accessor :original_total_volume
   attr_accessor :original_volumes_by_group
@@ -105,14 +107,14 @@ class Order < ApplicationRecord
   # Vérifie si une transition de statut est autorisée
   def allowed_transition?(to_status, from_status: nil)
     from_status ||= status.to_s
-    
+
     # Gérer le retour au statut précédent depuis annulee_acheteur ou annulee_vendeur
-    if (from_status == "annulee_acheteur" || from_status == "annulee_vendeur") && 
+    if (from_status == "annulee_acheteur" || from_status == "annulee_vendeur") &&
        previous_status.present?
       previous_status_key = Order.statuses.key(previous_status)
       return true if to_status == previous_status_key
     end
-    
+
     # Vérifier les transitions autorisées dans la map
     allowed = ALLOWED_TRANSITIONS.fetch(from_status, [])
     allowed.include?(to_status.to_s)
@@ -124,7 +126,7 @@ class Order < ApplicationRecord
   def store_previous_status_on_status_change
     return if new_record?  # Pas de previous_status pour une nouvelle commande
     return unless status_changed?  # Seulement si le statut change
-    
+
     # Sauvegarder le statut précédent
     self.previous_status = Order.statuses[status_was]
   end
@@ -217,6 +219,19 @@ class Order < ApplicationRecord
 
     if estimated_availability_earliest_at < Date.current
       errors.add(:estimated_availability_earliest_at, "doit être posterieur à la date du jour")
+    end
+  end
+
+  # Vérifie que le buyer et le seller ne peuvent pas être modifiés après la création
+  def buyer_and_seller_cannot_change_on_update
+    return if new_record?
+
+    if buyer_id_changed?
+      errors.add(:buyer_id, "ne peut pas être modifié après la création")
+    end
+
+    if seller_id_changed?
+      errors.add(:seller_id, "ne peut pas être modifié après la création")
     end
   end
 

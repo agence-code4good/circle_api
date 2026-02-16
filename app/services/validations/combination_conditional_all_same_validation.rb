@@ -29,7 +29,7 @@ module Validations
       if trigger_matched
         value.each_with_index do |val, idx|
           # Gérer les arrays (ex: C5, C20)
-          values_to_check = val.is_a?(Array) ? val : [val]
+          values_to_check = val.is_a?(Array) ? val : [ val ]
 
           values_to_check.each do |v|
             unless v == required_value

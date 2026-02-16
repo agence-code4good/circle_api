@@ -5,7 +5,7 @@ module Validations
   class ExcludedCombinationsValidation < BaseValidation
     def validate
       combinations = rule["excluded_combinations"] || []
-      values = value.is_a?(Array) ? value : [value]
+      values = value.is_a?(Array) ? value : [ value ]
 
       combinations.each do |comb|
         matched_values = get_matched_values(comb, values)
@@ -48,7 +48,7 @@ module Validations
     end
 
     def matches?(pattern, value)
-      if pattern.is_a?(String) && pattern.start_with?('/') && pattern.end_with?('/')
+      if pattern.is_a?(String) && pattern.start_with?("/") && pattern.end_with?("/")
         # Handle regex pattern sent as string "/regex/" in json confi file
         regex_pattern = Regexp.new(pattern[1..-2])
         value.to_s.match?(regex_pattern)
@@ -60,7 +60,7 @@ module Validations
     end
 
     def format_matched_values(matched_values)
-      matched_values.join(' + ')
+      matched_values.join(" + ")
     end
 
     # Keep the old methods for backward compatibility
@@ -70,14 +70,14 @@ module Validations
 
     def format_combination(combination)
       combination.map do |element|
-        if element.is_a?(String) && element.start_with?('/') && element.end_with?('/')
+        if element.is_a?(String) && element.start_with?("/") && element.end_with?("/")
           element
         elsif element.is_a?(Regexp)
           element.inspect
         else
           element
         end
-      end.join(' + ')
+      end.join(" + ")
     end
   end
 end

@@ -30,7 +30,7 @@ class Users::SessionsController < Devise::SessionsController
 
   def check_captcha
     # Ajouter les keys quand elles auront été générées
-    unless verify_recaptcha(secret_key: ENV["RECAPTCHA_SECRET_KEY"] )
+    unless verify_recaptcha(secret_key: ENV["RECAPTCHA_SECRET_KEY"])
       self.resource = resource_class.new sign_in_params
       respond_with_navigational(resource) do
         flash[:alert] = "La création de votre compte n’a pas pu être réalisée. Vous avez été identifié comme un bot." # à ajouter dans I18n
