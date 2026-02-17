@@ -11,4 +11,3 @@ class CreatePartnerAliases < ActiveRecord::Migration[8.1]
     add_index :partner_aliases, [ :partner_id, :external_id ], unique: true
   end
 end
-

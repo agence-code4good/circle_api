@@ -16,7 +16,7 @@ def post_json(path, body)
   request.body = body.to_json
 
   response = Net::HTTP.start(uri.host, uri.port) { |http| http.request(request) }
-  
+
   {
     status: response.code.to_i,
     body: JSON.parse(response.body)
@@ -71,7 +71,7 @@ result = post_json('/api/v1/validation', { circle_values: invalid_values })
 
 if result && result[:body]['errors']
   puts "✗ Codes invalides: #{result[:body]['errors'].join(', ')}"
-  
+
   result[:body]['circle_code'].each do |code_result|
     next if code_result['valid']
     puts "  - #{code_result['circle_code']}: #{code_result['errors'].join(', ')}"
@@ -96,7 +96,7 @@ def post_json_with_invalid_token(path, body, token)
   request.body = body.to_json
 
   response = Net::HTTP.start(uri.host, uri.port) { |http| http.request(request) }
-  
+
   {
     status: response.code.to_i,
     body: response.body

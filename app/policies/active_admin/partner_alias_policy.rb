@@ -33,4 +33,3 @@ class ActiveAdmin::PartnerAliasPolicy < ApplicationPolicy
     user.admin?
   end
 end
-

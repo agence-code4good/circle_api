@@ -25,4 +25,3 @@ class AddAuthTokenDigestToPartners < ActiveRecord::Migration[8.1]
     remove_column :partners, :auth_token_digest, :string if column_exists?(:partners, :auth_token_digest)
   end
 end
-

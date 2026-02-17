@@ -30,4 +30,3 @@ ActiveAdmin.register PartnerAlias do
     f.actions
   end
 end
-

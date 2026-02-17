@@ -16,14 +16,14 @@ def post_json(path, body)
   request.body = body.to_json
 
   response = Net::HTTP.start(uri.host, uri.port) { |http| http.request(request) }
-  
+
   # Gérer les réponses non-JSON (HTML, etc.)
   begin
     body = JSON.parse(response.body)
   rescue JSON::ParserError
     body = { error: "HTML response received (status: #{response.code})" }
   end
-  
+
   { status: response.code.to_i, body: body }
 rescue => e
   puts "Erreur: #{e.message}"
@@ -38,14 +38,14 @@ def patch_json(path, body)
   request.body = body.to_json
 
   response = Net::HTTP.start(uri.host, uri.port) { |http| http.request(request) }
-  
+
   # Gérer les réponses non-JSON (HTML, etc.)
   begin
     body = JSON.parse(response.body)
   rescue JSON::ParserError
     body = { error: "HTML response received (status: #{response.code})" }
   end
-  
+
   { status: response.code.to_i, body: body }
 rescue => e
   puts "Erreur: #{e.message}"
@@ -58,14 +58,14 @@ def get_json(path)
   request['Authorization'] = "Bearer #{AUTH_TOKEN}"
 
   response = Net::HTTP.start(uri.host, uri.port) { |http| http.request(request) }
-  
+
   # Gérer les réponses non-JSON (HTML, etc.)
   begin
     body = JSON.parse(response.body)
   rescue JSON::ParserError
     body = { error: "HTML response received (status: #{response.code})" }
   end
-  
+
   { status: response.code.to_i, body: body }
 rescue => e
   puts "Erreur: #{e.message}"
@@ -171,7 +171,7 @@ if result && result[:status] == 200
   else
     orders = result[:body]['orders'] || []
     puts "✓ #{orders.count} commande(s) trouvée(s)"
-    
+
     orders.first(3).each do |order|
       puts "  - #{order['order_reference']}: #{order['status']}"
     end

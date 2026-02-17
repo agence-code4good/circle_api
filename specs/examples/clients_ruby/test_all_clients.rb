@@ -21,13 +21,13 @@ def get_json(path)
   request['Authorization'] = "Bearer #{AUTH_TOKEN}"
 
   response = Net::HTTP.start(uri.host, uri.port) { |http| http.request(request) }
-  
+
   begin
     body = JSON.parse(response.body)
   rescue JSON::ParserError
     body = { error: "HTML response" }
   end
-  
+
   { status: response.code.to_i, body: body }
 rescue => e
   { status: 0, body: { error: e.message } }
@@ -41,13 +41,13 @@ def post_json(path, body)
   request.body = body.to_json
 
   response = Net::HTTP.start(uri.host, uri.port) { |http| http.request(request) }
-  
+
   begin
     body = JSON.parse(response.body)
   rescue JSON::ParserError
     body = { error: "HTML response" }
   end
-  
+
   { status: response.code.to_i, body: body }
 rescue => e
   { status: 0, body: { error: e.message } }
@@ -137,7 +137,7 @@ result = post_json('/api/v1/search_circle_values', {
     "C11" => "2017",
     "C13" => "A7"
   },
-  searched_values: ["C6", "C7"]
+  searched_values: [ "C6", "C7" ]
 })
 if result[:status] == 200 && result[:body]['circle_values']
   puts "  ✓ POST /api/v1/search_circle_values : #{result[:body]['circle_values'].keys.count} valeur(s) trouvée(s)"

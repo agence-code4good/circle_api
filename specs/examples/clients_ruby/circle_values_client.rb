@@ -40,7 +40,7 @@ input_values = {
   "C13" => "A7"
 }
 
-searched_values = ["C6", "C7", "C8", "C9"]
+searched_values = [ "C6", "C7", "C8", "C9" ]
 
 search_data = {
   input_values: input_values,
@@ -52,7 +52,7 @@ result = post_json('/api/v1/search_circle_values', search_data)
 if result && result[:status] == 200
   circle_values = result[:body]['circle_values']
   puts "✓ Recherche réussie! #{circle_values.keys.count} valeur(s) trouvée(s):"
-  
+
   circle_values.each do |code, data|
     puts "  - #{code}: #{data['label']} = #{data['circle_value']} (raw: #{data['value']})"
   end
@@ -74,7 +74,7 @@ incomplete_input = {
 
 result = post_json('/api/v1/search_circle_values', {
   input_values: incomplete_input,
-  searched_values: ["C6"]
+  searched_values: [ "C6" ]
 })
 
 if result && result[:status] == 400
@@ -95,7 +95,7 @@ invalid_key_input = {
 
 result = post_json('/api/v1/search_circle_values', {
   input_values: invalid_key_input,
-  searched_values: ["C6"]
+  searched_values: [ "C6" ]
 })
 
 if result && result[:status] == 400
@@ -117,7 +117,7 @@ missing_deps_input = {
 
 result = post_json('/api/v1/search_circle_values', {
   input_values: missing_deps_input,
-  searched_values: ["C6"]
+  searched_values: [ "C6" ]
 })
 
 if result && result[:status] == 400
