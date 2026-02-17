@@ -5,7 +5,9 @@ info:
     API pour la gestion et la validation des données Circle (codes produits vins).
     
     ## Authentification
-    Toutes les requêtes nécessitent un token Bearer fourni par un partenaire autorisé.
+    Toutes les requêtes nécessitent :
+    - un header `X-Partner-Code` indiquant le code du partenaire émetteur (ex. `circle`)
+    - un header `Authorization: Bearer <token>` contenant le token secret de ce partenaire
     
     ## Concepts clés
     - **Circle Codes** : Ensemble de codes (C0, C1, C2, etc.) décrivant un produit vin
@@ -618,12 +620,12 @@ components:
           example: "ORD-2025-999"
         buyer_id:
           type: string
-          description: Code du partenaire acheteur
-          example: "code4good"
+          description: Identifiant local de l'acheteur tel qu'il est connu par le partenaire émetteur (résolu via la table d'alias vers un `Partner.code`)
+          example: "BUYER_LOCAL_001"
         seller_id:
           type: string
-          description: Code du partenaire vendeur
-          example: "circle"
+          description: Identifiant local du vendeur tel qu'il est connu par le partenaire émetteur (résolu via la table d'alias vers un `Partner.code`)
+          example: "SELLER_LOCAL_ABC"
         status:
           type: string
           enum: [nouvelle_commande]

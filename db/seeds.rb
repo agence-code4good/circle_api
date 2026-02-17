@@ -1,4 +1,4 @@
-# # code4good user
+# code4good user
 
 puts "Création de l'utilisateur admin..."
 
@@ -20,13 +20,14 @@ puts "Création des partenaires..."
 
 Partner.destroy_all
 
-Partner.create!(name: "Code4Good", code: "code4good")
-user.update!(partner: Partner.find_by(code: "code4good"))
-Partner.create!(name: "Circle", code: "circle")
-Partner.create!(name: "Château Gazin", code: "chateau_gazin")
-Partner.create!(name: "La Cave à Part", code: "la_cave_a_part")
+code4good = Partner.create!(name: "Code4Good", code: "code4good", auth_token_for_set: "Code4GoodToken2026!")
+user.update!(partner: code4good)
 
-puts "Partenaires créés"
+circle = Partner.create!(name: "Circle", code: "circle", auth_token_for_set: "CircleToken2026!")
+chateau_gazin = Partner.create!(name: "Château Gazin", code: "chateau_gazin", auth_token_for_set: "ChateauGazinToken2026!")
+la_cave_a_part = Partner.create!(name: "La Cave à Part", code: "la_cave_a_part", auth_token_for_set: "LaCaveAPartToken2026!")
+
+puts "Partenaires créés avec tokens"
 
 # circle products
 

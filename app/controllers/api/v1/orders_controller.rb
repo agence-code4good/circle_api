@@ -5,6 +5,10 @@ class Api::V1::OrdersController < Api::BaseController
   def create
     @order = Order.new(order_params)
 
+    unless resolve_partner_ids!(@order)
+      return
+    end
+
     policy = OrderPolicy.new(@current_partner, @order)
     unless policy.create?
       render json: { error: "Forbidden : You must be the buyer to create an order" }, status: :forbidden
@@ -113,6 +117,26 @@ class Api::V1::OrdersController < Api::BaseController
       # Pas de modification des order_lines, mise à jour normale
       update_params = order_params.except(:order_lines_attributes)
 
+      # On ne permet pas de changer buyer_id / seller_id après création,
+      # mais on peut vérifier via les alias que les valeurs envoyées correspondent bien
+      # aux codes stockés, puis retirer ces clés pour éviter toute modification.
+      if update_params.key?(:buyer_id) || update_params.key?(:seller_id)
+        temp_order = @order.dup
+        temp_order.assign_attributes(buyer_id: update_params[:buyer_id]) if update_params.key?(:buyer_id)
+        temp_order.assign_attributes(seller_id: update_params[:seller_id]) if update_params.key?(:seller_id)
+
+        unless resolve_partner_ids!(temp_order)
+          return
+        end
+
+        if temp_order.buyer_id != @order.buyer_id || temp_order.seller_id != @order.seller_id
+          render json: { error: "buyer_id et seller_id ne peuvent pas être modifiés après la création" }, status: :unprocessable_entity
+          return
+        end
+
+        update_params = update_params.except(:buyer_id, :seller_id)
+      end
+
       if @order.update(update_params)
         render json: { order: @order }, status: :ok
       else
@@ -179,5 +203,27 @@ class Api::V1::OrdersController < Api::BaseController
         { circle_code: {} }
       ]
     )
+  end
+
+  def resolve_partner_ids!(order)
+    buyer_external_id = order.buyer_id
+    seller_external_id = order.seller_id
+
+    buyer_alias = PartnerAlias.find_by(partner_id: @current_partner.id, external_id: buyer_external_id)
+    seller_alias = PartnerAlias.find_by(partner_id: @current_partner.id, external_id: seller_external_id)
+
+    errors = {}
+    errors[:buyer_id] = [ "Alias introuvable pour #{buyer_external_id}" ] unless buyer_alias
+    errors[:seller_id] = [ "Alias introuvable pour #{seller_external_id}" ] unless seller_alias
+
+    unless errors.empty?
+      render json: { errors: errors }, status: :unprocessable_entity
+      return false
+    end
+
+    order.buyer_id = buyer_alias.partner_code
+    order.seller_id = seller_alias.partner_code
+
+    true
   end
 end

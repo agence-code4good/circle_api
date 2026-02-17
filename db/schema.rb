@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_29_085220) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -111,8 +111,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_085220) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "partner_aliases", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "external_id", null: false
+    t.string "partner_code", null: false
+    t.bigint "partner_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["partner_id", "external_id"], name: "index_partner_aliases_on_partner_id_and_external_id", unique: true
+    t.index ["partner_id"], name: "index_partner_aliases_on_partner_id"
+  end
+
   create_table "partners", force: :cascade do |t|
-    t.string "auth_token"
+    t.string "auth_token_digest"
     t.string "code"
     t.datetime "created_at", null: false
     t.string "name"
@@ -138,5 +148,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_085220) do
   add_foreign_key "api_logs", "partners"
   add_foreign_key "circle_codes", "circle_products"
   add_foreign_key "order_lines", "orders"
+  add_foreign_key "partner_aliases", "partners"
   add_foreign_key "users", "partners"
 end
