@@ -29,6 +29,22 @@ la_cave_a_part = Partner.create!(name: "La Cave à Part", code: "la_cave_a_part"
 
 puts "Partenaires créés avec tokens"
 
+# partner aliases (code4good en tant que partenaire émetteur)
+puts "Création des aliases partenaires..."
+
+PartnerAlias.destroy_all
+
+PartnerAlias.create!(partner: code4good, external_id: "ext_code4good", partner_code: "code4good")
+PartnerAlias.create!(partner: code4good, external_id: "ext_circle", partner_code: "circle")
+PartnerAlias.create!(partner: code4good, external_id: "ext_chateau_gazin", partner_code: "chateau_gazin")
+PartnerAlias.create!(partner: code4good, external_id: "ext_la_cave_a_part", partner_code: "la_cave_a_part")
+
+# Aliases quand Château Gazin est l'émetteur (seller)
+PartnerAlias.create!(partner: chateau_gazin, external_id: "ext_code4good", partner_code: "code4good")
+PartnerAlias.create!(partner: chateau_gazin, external_id: "ext_chateau_gazin", partner_code: "chateau_gazin")
+
+puts "Aliases partenaires créés"
+
 # circle products
 
 puts "Création des produits Circle..."

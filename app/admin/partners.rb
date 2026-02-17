@@ -33,6 +33,25 @@ ActiveAdmin.register Partner do
       row :created_at
       row :updated_at
     end
+
+    panel "Aliases pour ce partenaire (en tant qu'émetteur)" do
+      table_for resource.partner_aliases do
+        column :external_id
+        column "Partenaire cible" do |alias_record|
+          target = Partner.find_by(code: alias_record.partner_code)
+          if target
+            link_to "#{target.name} (#{target.code})", admin_partner_path(target)
+          else
+            alias_record.partner_code
+          end
+        end
+        column :created_at
+        column :updated_at
+        column "Voir l'alias" do |alias_record|
+          link_to "Voir", admin_partner_alias_path(alias_record)
+        end
+      end
+    end
   end
 
   form do |f|
