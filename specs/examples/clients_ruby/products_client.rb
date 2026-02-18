@@ -14,14 +14,14 @@ def get_json(path)
   request['Authorization'] = "Bearer #{AUTH_TOKEN}"
 
   response = Net::HTTP.start(uri.host, uri.port) { |http| http.request(request) }
-  
+
   # Gérer les réponses non-JSON (HTML, etc.)
   begin
     body = JSON.parse(response.body)
   rescue JSON::ParserError
     body = response.body
   end
-  
+
   { status: response.code.to_i, body: body }
 rescue => e
   puts "Erreur: #{e.message}"
@@ -38,7 +38,7 @@ result = get_json('/api/v1/products')
 if result && result[:status] == 200
   products = result[:body]
   puts "✓ #{products.count} produit(s) trouvé(s)"
-  
+
   products.first(10).each do |product|
     puts "  - #{product['c10']}: #{product['label']}"
   end
