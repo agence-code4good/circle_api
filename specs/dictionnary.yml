@@ -570,7 +570,7 @@ C51:
     "A0": "Non"
     "A1": "Présence d'un pass export"
 C52E:
-  label: "specific_back_label_BAT"
+  label: "specific_back_label_bat"
   type: "string"
   enum:
     "00": "ND"
@@ -713,6 +713,8 @@ C77P:
 C78:
   label: "bottle_size_available"
   type: "string"
+  enum:
+    "00": "ND"
 C79:
   label: "case_available"
   type: "string"
