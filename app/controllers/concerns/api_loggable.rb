@@ -80,7 +80,8 @@ module ApiLoggable
       authorization: request.headers["Authorization"].present? ? "Bearer [REDACTED]" : nil,
       content_type: request.headers["Content-Type"],
       accept: request.headers["Accept"],
-      user_agent: request.headers["User-Agent"]
+      user_agent: request.headers["User-Agent"],
+      x_partner_code: request.headers["X-Partner-Code"]
     }.compact
   end
 

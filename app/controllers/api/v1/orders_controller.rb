@@ -217,6 +217,16 @@ class Api::V1::OrdersController < Api::BaseController
     errors[:seller_id] = [ "Alias introuvable pour #{seller_external_id}" ] unless seller_alias
 
     unless errors.empty?
+      # Enrichir les logs pour faciliter le debug (alias manquant, typo, etc.)
+      @validation_errors = {
+        errors: errors,
+        alias_lookup_debug: {
+          partner_code: @current_partner.code,
+          requested_buyer_id: buyer_external_id,
+          requested_seller_id: seller_external_id,
+          available_external_ids: PartnerAlias.where(partner_id: @current_partner.id).pluck(:external_id)
+        }
+      }
       render json: { errors: errors }, status: :unprocessable_entity
       return false
     end
