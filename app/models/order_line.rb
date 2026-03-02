@@ -7,7 +7,11 @@ class OrderLine < ApplicationRecord
   scope :from_order_reference, ->(order_reference) { where(order_id: Order.find_by(order_reference: order_reference).id) }
 
   def total_volume
-    circle_code["C31"].to_i
+    bottle_size = Validations::BaseValidation.enum_numeric_value_for("C13", circle_code["C13"])
+    quantity = circle_code["C31"].to_i
+    return quantity unless bottle_size
+
+    (quantity * bottle_size).fdiv(0.75).ceil
   end
 
   def is_valid

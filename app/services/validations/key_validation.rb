@@ -10,7 +10,7 @@ module Validations
 
       # Comparer avec la valeur fournie
       if value != expected_key
-        return "La clé CLE fournie (#{value}) n'est pas valide (Clé attendue : #{expected_key})."
+        return "La clé CLE fournie (#{value}) n'est pas valide."
       end
 
       nil
