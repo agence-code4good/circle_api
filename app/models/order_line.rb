@@ -6,12 +6,18 @@ class OrderLine < ApplicationRecord
 
   scope :from_order_reference, ->(order_reference) { where(order_id: Order.find_by(order_reference: order_reference).id) }
 
+  def is_casket?
+    circle_code.is_a?(Hash) && circle_code["C2"].is_a?(Array)
+  end
+
   def total_volume
+    return circle_code["C31"].to_i if is_casket?
+
     bottle_size = Validations::BaseValidation.enum_numeric_value_for("C13", circle_code["C13"])
     quantity = circle_code["C31"].to_i
     return quantity unless bottle_size
 
-    (quantity * bottle_size).fdiv(0.75).ceil
+    (quantity * bottle_size).fdiv(0.75).round(3)
   end
 
   def is_valid

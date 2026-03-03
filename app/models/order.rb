@@ -167,11 +167,22 @@ class Order < ApplicationRecord
     all_group_keys = (@original_volumes_by_group.keys + new_volumes_by_group.keys).uniq
 
     all_group_keys.each do |group_key|
+      kind, *_rest = group_key.split("|", 3)
+
       original_volume = @original_volumes_by_group[group_key] || 0
       new_volume = new_volumes_by_group[group_key] || 0
 
-      if original_volume != new_volume
-        errors.add(:base, "Le volume total pour le groupe #{group_key} ne peut pas être modifié (était #{original_volume}, devient #{new_volume})")
+      if kind == "casket"
+        # Coffret : aucune tolérance
+        if original_volume != new_volume
+          errors.add(:base, "Le volume total (nb de caisses) pour le groupe #{group_key} ne peut pas être modifié (était #{original_volume}, devient #{new_volume})")
+        end
+      else
+        # Non coffret : tolérance ≤ 1
+        difference = (original_volume.to_f - new_volume.to_f).abs
+        if difference > 1
+          errors.add(:base, "Le volume total (nb de col) pour le groupe #{group_key} ne peut pas être modifié (était #{original_volume}, devient #{new_volume})")
+        end
       end
     end
   end
@@ -235,8 +246,13 @@ class Order < ApplicationRecord
     end
   end
 
-  # Génère une clé unique pour un groupe basée sur C10 et C11
+  # Génère une clé unique pour un groupe basée sur C10 et C11, et détermine si le groupe est un coffret
   def group_key_for_line(circle_code)
-    "#{circle_code["C10"]}|#{circle_code["C11"]}"
+    c10 = circle_code["C10"]
+    c11 = circle_code["C11"]
+
+    kind = circle_code["C2"].is_a?(Array) ? "casket" : "standart"
+
+    "#{kind}|#{c10}|#{c11}"
   end
 end
