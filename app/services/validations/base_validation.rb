@@ -12,6 +12,27 @@ module Validations
       @dictionary ||= YAML.load_file(DICTIONARY_PATH)
     end
 
+    # Retourne la valeur d'enum lisible pour un code Circle et une valeur brute.
+    # Ex: enum_value_for("C13", "A5") => "0,70 L"
+    def self.enum_value_for(code, value)
+      return value.to_s if value.nil?
+      dict = dictionary[code.to_s]
+      return value.to_s unless dict
+      dict.dig("enum", value.to_s) || value.to_s
+    end
+
+    # Retourne la valeur numérique extraite du libellé d'enum, ou nil si "ND".
+    # Ex: enum_numeric_value_for("C13", "A7") => 0.75
+    def self.enum_numeric_value_for(code, value)
+      label = enum_value_for(code, value)
+      return nil if label.blank? || label.to_s.strip == "ND"
+      # Format "X,Y L" (virgule décimale) -> Float
+      num_str = label.to_s.gsub(/\s*L\z/i, "").tr(",", ".")
+      Float(num_str)
+    rescue ArgumentError, TypeError
+      nil
+    end
+
     def self.parse_excluded_vintages(excluded_vintages_str)
       return [] if excluded_vintages_str.nil? || excluded_vintages_str.strip.empty? || excluded_vintages_str.strip == "ND"
       excluded_vintages_str.split(",").map(&:strip).reject(&:empty?)
