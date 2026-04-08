@@ -9,9 +9,21 @@ class Api::V1::OrdersController < Api::BaseController
       return
     end
 
+    # Support creation "au nom de" by a broker.
+    # If the authenticated partner is not the buyer, we treat them as a broker candidate
+    # and only allow creation if a valid broker->buyer mandate exists.
+    if @order.buyer_id != @current_partner.code
+      unless BrokerMandate.active_for_codes?(broker_code: @current_partner.code, buyer_code: @order.buyer_id)
+        render json: { error: "Forbidden : You are not allowed to create an order on behalf of this buyer" }, status: :forbidden
+        return
+      end
+
+      @order.broker_id = @current_partner.code
+    end
+
     policy = OrderPolicy.new(@current_partner, @order)
     unless policy.create?
-      render json: { error: "Forbidden : You must be the buyer to create an order" }, status: :forbidden
+      render json: { error: "Forbidden" }, status: :forbidden
       return
     end
 
@@ -194,6 +206,7 @@ class Api::V1::OrdersController < Api::BaseController
       :initial_order_reference,
       :buyer_id,
       :seller_id,
+      :broker_id,
       :note,
       :status,
       :accompanying_document_url,

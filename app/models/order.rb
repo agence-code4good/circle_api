@@ -3,6 +3,7 @@ class Order < ApplicationRecord
   has_many :api_logs, dependent: :destroy
   validates :buyer_id, presence: true
   validates :seller_id, presence: true
+  validate :broker_code_must_exist
   validates :order_reference, presence: true
   validates :status, presence: true
   validates :order_reference, uniqueness: true, presence: true
@@ -21,6 +22,8 @@ class Order < ApplicationRecord
   validate :status_transition_is_allowed, on: :update
   validate :initial_order_reference_exists
   validate :buyer_and_seller_cannot_change_on_update, on: :update
+  validate :broker_id_cannot_change_on_update, on: :update
+  validate :broker_mandate_must_exist_when_broker_present, on: :create
 
   accepts_nested_attributes_for :order_lines, allow_destroy: true
 
@@ -60,7 +63,7 @@ class Order < ApplicationRecord
 
   ## Ransackable attributes pour la recherche dans l'admin ##
   def self.ransackable_attributes(auth_object = nil)
-    [ "buyer_id", "created_at", "id", "id_value", "note", "order_reference", "seller_id", "status", "updated_at", "accompanying_document_url", "latest_instruction_due_date", "estimated_availability_earliest_at" ]
+    [ "buyer_id", "broker_id", "created_at", "id", "id_value", "note", "order_reference", "seller_id", "status", "updated_at", "accompanying_document_url", "latest_instruction_due_date", "estimated_availability_earliest_at" ]
   end
 
   ## Méthodes liées à l'Order ##
@@ -254,5 +257,28 @@ class Order < ApplicationRecord
     kind = circle_code["C2"].is_a?(Array) ? "casket" : "standart"
 
     "#{kind}|#{c10}|#{c11}"
+  end
+
+  def broker_id_cannot_change_on_update
+    return if new_record?
+    return unless will_save_change_to_broker_id?
+
+    errors.add(:broker_id, "ne peut pas être modifié après la création")
+  end
+
+  def broker_mandate_must_exist_when_broker_present
+    return if broker_id.blank?
+    return if buyer_id.blank?
+
+    unless BrokerMandate.active_for_codes?(broker_code: broker_id, buyer_code: buyer_id)
+      errors.add(:broker_id, "n'est pas mandaté pour ce buyer")
+    end
+  end
+
+  def broker_code_must_exist
+    return if broker_id.blank?
+    return if Partner.exists?(code: broker_id)
+
+    errors.add(:broker_id, "doit correspondre à un partenaire existant")
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_08_120001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -71,6 +71,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
     t.index ["validation_success"], name: "index_api_logs_on_validation_success"
   end
 
+  create_table "broker_mandates", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.bigint "broker_partner_id", null: false
+    t.bigint "buyer_partner_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "ends_at"
+    t.datetime "starts_at"
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_broker_mandates_on_active"
+    t.index ["broker_partner_id", "buyer_partner_id"], name: "index_broker_mandates_on_broker_and_buyer", unique: true
+    t.index ["broker_partner_id"], name: "index_broker_mandates_on_broker_partner_id"
+    t.index ["buyer_partner_id"], name: "index_broker_mandates_on_buyer_partner_id"
+  end
+
   create_table "circle_codes", force: :cascade do |t|
     t.bigint "circle_product_id", null: false
     t.string "code", null: false
@@ -98,6 +112,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
 
   create_table "orders", force: :cascade do |t|
     t.string "accompanying_document_url"
+    t.string "broker_id"
     t.string "buyer_id"
     t.datetime "created_at", null: false
     t.date "estimated_availability_earliest_at"
@@ -109,6 +124,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
     t.string "seller_id"
     t.integer "status"
     t.datetime "updated_at", null: false
+    t.index ["broker_id"], name: "index_orders_on_broker_id"
   end
 
   create_table "partner_aliases", force: :cascade do |t|
@@ -146,6 +162,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
 
   add_foreign_key "api_logs", "orders"
   add_foreign_key "api_logs", "partners"
+  add_foreign_key "broker_mandates", "partners", column: "broker_partner_id"
+  add_foreign_key "broker_mandates", "partners", column: "buyer_partner_id"
   add_foreign_key "circle_codes", "circle_products"
   add_foreign_key "order_lines", "orders"
   add_foreign_key "partner_aliases", "partners"
