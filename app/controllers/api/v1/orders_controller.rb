@@ -14,7 +14,7 @@ class Api::V1::OrdersController < Api::BaseController
     # and only allow creation if a valid broker->buyer mandate exists.
     if @order.buyer_id != @current_partner.code
       unless BrokerMandate.active_for_codes?(broker_code: @current_partner.code, buyer_code: @order.buyer_id)
-        render json: { error: "Forbidden : You are not allowed to create an order on behalf of this buyer" }, status: :forbidden
+        render json: { error: "Interdit : vous n'êtes pas autorisé à créer une commande au nom de ce buyer" }, status: :forbidden
         return
       end
 
