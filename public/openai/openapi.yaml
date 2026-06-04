@@ -4,10 +4,15 @@ info:
   description: |
     API pour la gestion et la validation des données Circle (codes produits vins).
     
-    ## Authentification
-    Toutes les requêtes nécessitent :
-    - un header `X-Partner-Code` indiquant le code du partenaire émetteur (ex. `circle`)
-    - un header `Authorization: Bearer <token>` contenant le token secret de ce partenaire
+    ## Authentification (Handshake v2)
+    Toutes les requêtes API métier nécessitent :
+    - `Authorization: Bearer <inbound_token>` — secret de la relation bilatérale
+    - `X-Partner-Code` — code du partenaire émetteur
+    - `X-Handshake-Nonce`, `X-Handshake-Timestamp`, `X-Handshake-Signature` — signature Ed25519 (voir `specs/handshake_v2_signing.md`)
+    
+    Endpoints handshake :
+    - `GET /api/identity` — clé publique de l'instance (sans auth)
+    - `POST /api/challenge` — validation bilatérale de la configuration
     
     ## Concepts clés
     - **Circle Codes** : Ensemble de codes (C0, C1, C2, etc.) décrivant un produit vin
@@ -26,6 +31,8 @@ servers:
     description: Serveur de production
 
 tags:
+  - name: Handshake
+    description: Identité instance et challenge bilatéral
   - name: Validation
     description: Validation de circle codes sans commande associée
   - name: Orders
@@ -39,6 +46,63 @@ security:
   - BearerAuth: []
 
 paths:
+  /api/identity:
+    get:
+      tags:
+        - Handshake
+      summary: Clé publique de l'instance
+      security: []
+      responses:
+        '200':
+          description: Identité Ed25519
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  algorithm:
+                    type: string
+                    example: Ed25519
+                  public_key:
+                    type: string
+                  key_version:
+                    type: integer
+
+  /api/challenge:
+    post:
+      tags:
+        - Handshake
+      summary: Challenge bilatéral
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: X-Partner-Code
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nonce
+                - signature
+              properties:
+                nonce:
+                  type: string
+                signature:
+                  type: string
+      responses:
+        '200':
+          description: Nonce signé par l'instance réceptrice
+        '401':
+          description: Non autorisé
+        '403':
+          description: Connexion suspendue ou key_mismatch
+
   /api/v1/validation:
     post:
       tags:
@@ -450,8 +514,7 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
-      description: Token d'authentification fourni par un partner
+      description: Token inbound de la relation bilatérale (PartnerConnection)
 
   schemas:
     # ==================== Validation ====================

@@ -23,6 +23,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Stage "development" : gems déjà compilées (bcrypt, etc.) + make pour bundle install
+      target: development
     container_name: circle_api_app
     depends_on:
       db:
@@ -33,6 +35,7 @@ services:
       # Base de données
       - DATABASE_URL=postgres://circle_api:${DB_PASSWORD:-circle_api_password}@db:5432/circle_api_development
       - RAILS_ENV=development
+      - HANDSHAKE_INSTANCE_CODE=circle
       # Logs
       - RAILS_LOG_LEVEL=${RAILS_LOG_LEVEL:-debug}
       # Éditeur pour rails credentials:edit
@@ -42,7 +45,8 @@ services:
     volumes:
       - .:/rails
       - circle_api_storage:/rails/storage
-      - bundle_cache:/usr/local/bundle
+      # Ne pas monter bundle_cache : un volume vide masque les gems de l'image et force
+      # une recompilation (make absent dans l'image production).
     restart: unless-stopped
     networks:
       - circle_api_network
@@ -56,8 +60,6 @@ volumes:
   postgres_data:
     driver: local
   circle_api_storage:
-    driver: local
-  bundle_cache:
     driver: local
 
 networks:

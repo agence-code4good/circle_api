@@ -1,5 +1,5 @@
 ActiveAdmin.register Partner do
-  permit_params :name, :code, :auth_token_for_set
+  permit_params :name, :code
 
   actions :all, except: []
 
@@ -14,8 +14,8 @@ ActiveAdmin.register Partner do
     id_column
     column :name
     column :code
-    column "Token" do |partner|
-      partner.auth_token_digest.present? ? "Défini" : "Non défini"
+    column "Connexions" do |partner|
+      partner.partner_connections.count
     end
     column :created_at
     column :updated_at
@@ -27,11 +27,20 @@ ActiveAdmin.register Partner do
       row :id
       row :name
       row :code
-      row "Token" do |partner|
-        partner.auth_token_digest.present? ? "Défini à la création (non affiché)" : "Non défini"
-      end
       row :created_at
       row :updated_at
+    end
+
+    panel "Connexions handshake" do
+      table_for resource.partner_connections do
+        column :id
+        column :remote_base_url
+        column :status
+        column "Actions" do |conn|
+          link_to "Voir", admin_partner_connection_path(conn)
+        end
+      end
+      para link_to "Nouvelle connexion", new_admin_partner_connection_path(partner_connection: { partner_id: resource.id })
     end
 
     panel "Aliases pour ce partenaire (en tant qu'émetteur)" do
@@ -59,14 +68,7 @@ ActiveAdmin.register Partner do
     f.inputs do
       f.input :name
       f.input :code
-      if f.object.new_record? || f.object.auth_token_digest.blank?
-        f.input :auth_token_for_set,
-                as: :password,
-                label: "Token (saisi une seule fois, non ré-affiché)",
-                input_html: { autocomplete: "new-password" }
-      else
-        para "Un token est déjà défini pour ce partenaire. Il n'est pas affiché et ne peut pas être modifié depuis l'interface."
-      end
+      para "Les tokens d'authentification sont gérés par les connexions handshake (PartnerConnection)."
     end
     f.actions
   end

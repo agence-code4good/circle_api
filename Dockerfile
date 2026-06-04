@@ -88,3 +88,23 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
 CMD ["./bin/thrust", "./bin/rails", "server"]
+
+# Docker Compose dev: install :development/:test gems (debug, etc.)
+FROM build AS development
+
+USER root
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential git && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV BUNDLE_DEPLOYMENT="0" \
+    BUNDLE_WITHOUT=""
+
+RUN bundle install && \
+    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
+
+USER 1000:1000
+
+EXPOSE 80
+ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "80"]

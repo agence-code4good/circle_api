@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_04_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,9 +46,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
     t.string "endpoint", null: false
     t.text "error_backtrace"
     t.text "error_message"
+    t.string "handshake_event"
     t.string "http_method", null: false
     t.inet "ip_address"
     t.bigint "order_id"
+    t.bigint "partner_connection_id"
     t.bigint "partner_id"
     t.string "path"
     t.text "request_body"
@@ -64,6 +66,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
     t.index ["created_at"], name: "index_api_logs_on_created_at"
     t.index ["endpoint", "created_at"], name: "index_api_logs_on_endpoint_and_created_at"
     t.index ["order_id"], name: "index_api_logs_on_order_id"
+    t.index ["partner_connection_id"], name: "index_api_logs_on_partner_connection_id"
     t.index ["partner_id", "created_at"], name: "index_api_logs_on_partner_id_and_created_at"
     t.index ["partner_id"], name: "index_api_logs_on_partner_id"
     t.index ["request_id"], name: "index_api_logs_on_request_id"
@@ -85,6 +88,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
 
   create_table "circle_products", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "instance_identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "key_version", default: 1, null: false
+    t.text "private_key", null: false
+    t.string "public_key", null: false
+    t.datetime "rotated_at"
     t.datetime "updated_at", null: false
   end
 
@@ -121,8 +133,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
     t.index ["partner_id"], name: "index_partner_aliases_on_partner_id"
   end
 
+  create_table "partner_connections", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "handshake_version", default: 2, null: false
+    t.datetime "inbound_challenge_verified_at"
+    t.text "inbound_token"
+    t.datetime "last_challenge_at"
+    t.datetime "last_successful_exchange_at"
+    t.string "linkage_code_local"
+    t.string "linkage_code_remote"
+    t.datetime "outbound_challenge_verified_at"
+    t.text "outbound_token"
+    t.bigint "partner_id", null: false
+    t.string "pinned_public_key"
+    t.string "pinned_public_key_fingerprint"
+    t.string "remote_base_url", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["partner_id", "remote_base_url"], name: "index_partner_connections_on_partner_id_and_remote_base_url", unique: true
+    t.index ["partner_id"], name: "index_partner_connections_on_partner_id"
+    t.index ["status"], name: "index_partner_connections_on_status"
+  end
+
   create_table "partners", force: :cascade do |t|
-    t.string "auth_token_digest"
     t.string "code"
     t.datetime "created_at", null: false
     t.string "name"
@@ -149,5 +182,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_090500) do
   add_foreign_key "circle_codes", "circle_products"
   add_foreign_key "order_lines", "orders"
   add_foreign_key "partner_aliases", "partners"
+  add_foreign_key "partner_connections", "partners"
   add_foreign_key "users", "partners"
 end

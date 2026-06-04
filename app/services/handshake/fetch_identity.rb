@@ -1,0 +1,80 @@
+# frozen_string_literal: true
+
+require "net/http"
+require "json"
+
+module Handshake
+  class FetchIdentity
+    class FetchError < StandardError; end
+
+    def initialize(connection, approve_rotation: false)
+      @connection = connection
+      @approve_rotation = approve_rotation
+    end
+
+    def call
+      url = identity_url
+      response = http_get(url)
+      raise FetchError, "HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+      payload = JSON.parse(response.body)
+      public_key = payload["public_key"]
+      raise FetchError, "public_key manquante" if public_key.blank?
+
+      handle_tofu(public_key)
+      { public_key: public_key, key_version: payload["key_version"], algorithm: payload["algorithm"] }
+    rescue JSON::ParserError => e
+      raise FetchError, "Réponse JSON invalide: #{e.message}"
+    end
+
+    private
+
+    def identity_url
+      "#{resolved_remote_base_url}/api/identity"
+    end
+
+    def resolved_remote_base_url
+      OutboundUrl.resolve(@connection.remote_base_url)
+    end
+
+    def http_get(url)
+      uri = URI.parse(url)
+      Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 10, read_timeout: 10) do |http|
+        http.get(uri.request_uri, { "Accept" => "application/json" })
+      end
+    rescue Errno::ECONNREFUSED, SocketError => e
+      raise FetchError, connection_refused_message(e)
+    end
+
+    def connection_refused_message(error)
+      target = resolved_remote_base_url
+      stored = @connection.remote_base_url
+      hint = if stored != target
+               " (URL utilisée : #{target}, enregistrée : #{stored})"
+             else
+               ""
+             end
+      "Connexion refusée vers #{target}#{hint}. #{error.message}. " \
+        "En Docker, préférez http://app ou http://app_b plutôt que localhost:3000."
+    end
+
+    def handle_tofu(public_key)
+      fingerprint = Crypto.fingerprint(public_key)
+
+      if @connection.pinned_public_key.blank?
+        @connection.pin_public_key!(public_key)
+        return
+      end
+
+      if @connection.pinned_public_key_fingerprint != fingerprint
+        if @approve_rotation
+          @connection.pin_public_key!(public_key)
+          return
+        end
+
+        @connection.mark_key_mismatch!
+        raise FetchError, "Clé publique divergente (rotation détectée). Statut: key_mismatch."
+      end
+    end
+  end
+end

@@ -27,6 +27,10 @@ class Rack::Attack
     req.ip # unless req.path.start_with?('/assets')
   end
 
+  throttle("api/identity/ip", limit: 30, period: 1.minute) do |req|
+    req.ip if req.path == "/api/identity" && req.get?
+  end
+
   ### Prevent Brute-Force Login Attacks ###
 
   # The most common brute-force login attack is a brute-force password

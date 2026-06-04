@@ -26,7 +26,8 @@ specs/examples/clients_ruby/
 Dans le terminal, depuis la racine du projet :
 
 ```bash
-bin/rails runner "puts Partner.first.auth_token"
+# Les tokens sont sur PartnerConnection (inbound), plus sur Partner.
+# Après db:seed, voir les tokens affichés dans les logs ou ActiveAdmin.
 ```
 
 ### 2. Configurer les clients

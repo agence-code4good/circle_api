@@ -1,5 +1,6 @@
 class ApiLog < ApplicationRecord
   belongs_to :partner, optional: true
+  belongs_to :partner_connection, optional: true
   belongs_to :order, optional: true
 
   # Scopes pour filtres et dashboard
