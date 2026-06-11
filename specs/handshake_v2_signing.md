@@ -19,6 +19,12 @@
 
 Le timestamp doit être à ± **300 secondes** de l’heure serveur. Sinon : `401` avec `{ "error": "timestamp_expired" }`.
 
+### Anti-rejeu (nonce à usage unique)
+
+Le `X-Handshake-Nonce` est **à usage unique par connexion**. Le récepteur enregistre chaque nonce consommé (après vérification de la signature) et rejette toute requête réutilisant un nonce déjà vu : `401` avec `{ "error": "nonce_replayed" }`.
+
+Les nonces sont conservés au moins aussi longtemps que la fenêtre temporelle (300 s + marge), puis purgés. Un nonce expiré ne peut pas être rejoué car son timestamp d’origine est alors hors fenêtre.
+
 ## Message canonique (échanges API)
 
 ```
@@ -73,8 +79,10 @@ La signature réponse est produite avec la **clé privée de l’instance récep
 |-----------|---------|-----|
 | 401 | `unauthorized` | Token ou partenaire invalide |
 | 401 | `invalid_signature` | Signature appelant invalide |
+| 401 | `nonce_replayed` | Nonce déjà utilisé pour cette connexion |
 | 403 | `connection_suspended` | Relation non active |
 | 403 | `key_mismatch` | Clé publique épinglée incompatible |
+| 403 | `missing_public_key` | Aucune clé publique épinglée pour la connexion |
 | 422 | `missing_nonce` | Corps invalide |
 
 ## GET /api/identity

@@ -24,14 +24,6 @@ class Api::HandshakeController < ActionController::API
       return render json: { error: "unauthorized" }, status: :unauthorized
     end
 
-    if connection.status == "suspended"
-      return render json: { error: "connection_suspended" }, status: :forbidden
-    end
-
-    if connection.status == "key_mismatch"
-      return render json: { error: "key_mismatch" }, status: :forbidden
-    end
-
     payload = challenge_params
     result = Handshake::Challenge.new(
       connection: connection,
@@ -63,7 +55,7 @@ class Api::HandshakeController < ActionController::API
 
   def challenge_error_status(code)
     case code
-    when "connection_suspended", "key_mismatch" then :forbidden
+    when "connection_suspended", "key_mismatch", "missing_public_key" then :forbidden
     when "missing_nonce" then :unprocessable_entity
     else :unauthorized
     end

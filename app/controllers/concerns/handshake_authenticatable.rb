@@ -35,6 +35,15 @@ module HandshakeAuthenticatable
       return
     end
 
+    unless Handshake::NonceGuard.consume(
+      connection: @current_connection,
+      nonce: request.headers["X-Handshake-Nonce"].to_s,
+      purpose: "request"
+    )
+      render_handshake_error(:unauthorized, "nonce_replayed")
+      return
+    end
+
     @current_partner = @current_connection.partner
     @current_connection.touch_successful_exchange!
   end

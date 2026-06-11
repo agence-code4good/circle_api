@@ -5,6 +5,8 @@ module Handshake
     queue_as :default
 
     def perform
+      NonceGuard.prune_expired
+
       PartnerConnection.where(status: "active").find_each do |connection|
         FetchIdentity.new(connection).call
       rescue FetchIdentity::FetchError => e

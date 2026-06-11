@@ -24,6 +24,10 @@ module Handshake
       raise ChallengeError.new("Nonce manquant", code: "missing_nonce") if @nonce.blank?
       raise ChallengeError.new("Signature invalide", code: "invalid_signature") unless verify_caller_signature
 
+      unless NonceGuard.consume(connection: @connection, nonce: @nonce, purpose: "challenge")
+        raise ChallengeError.new("Nonce rejoué", code: "nonce_replayed")
+      end
+
       response_signature = Signing.sign_nonce(IdentityService.private_key, @nonce)
 
       @connection.update!(

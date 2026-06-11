@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_04_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_11_171900) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -89,6 +89,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_04_100000) do
   create_table "circle_products", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "handshake_nonces", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.string "nonce", null: false
+    t.bigint "partner_connection_id", null: false
+    t.string "purpose", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_handshake_nonces_on_expires_at"
+    t.index ["partner_connection_id", "nonce"], name: "index_handshake_nonces_on_partner_connection_id_and_nonce", unique: true
+    t.index ["partner_connection_id"], name: "index_handshake_nonces_on_partner_connection_id"
   end
 
   create_table "instance_identities", force: :cascade do |t|
@@ -180,6 +192,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_04_100000) do
   add_foreign_key "api_logs", "orders"
   add_foreign_key "api_logs", "partners"
   add_foreign_key "circle_codes", "circle_products"
+  add_foreign_key "handshake_nonces", "partner_connections"
   add_foreign_key "order_lines", "orders"
   add_foreign_key "partner_aliases", "partners"
   add_foreign_key "partner_connections", "partners"
