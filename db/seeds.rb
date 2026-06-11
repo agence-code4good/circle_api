@@ -1,5 +1,19 @@
 # frozen_string_literal: true
 
+# Dispatch vers un profil d'instance dédié pour les tests handshake à deux instances.
+# SEED_INSTANCE=circle    → db/seeds/instance_circle.rb    (A, port 3000, catalogue)
+# SEED_INSTANCE=code4good → db/seeds/instance_code4good.rb (B, port 3001, pair Circle)
+seed_instance = ENV["SEED_INSTANCE"].to_s.strip
+if seed_instance.present?
+  profile = Rails.root.join("db/seeds/instance_#{seed_instance}.rb")
+  if File.exist?(profile)
+    load profile
+    return
+  else
+    abort "SEED_INSTANCE=#{seed_instance} mais #{profile} introuvable"
+  end
+end
+
 puts "=== Seed Circle API ==="
 
 ApiLog.update_all(order_id: nil, partner_id: nil, partner_connection_id: nil)
