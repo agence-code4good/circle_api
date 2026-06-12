@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Handshake
-  # Réécrit les URL « navigateur » (localhost:3000) en URL joignables depuis le conteneur Docker.
   class OutboundUrl
     def self.resolve(base_url)
       normalized = base_url.to_s.chomp("/")

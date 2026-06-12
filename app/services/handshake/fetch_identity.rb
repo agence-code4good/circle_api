@@ -51,11 +51,10 @@ module Handshake
       stored = @connection.remote_base_url
       hint = if stored != target
                " (URL utilisée : #{target}, enregistrée : #{stored})"
-             else
+      else
                ""
-             end
-      "Connexion refusée vers #{target}#{hint}. #{error.message}. " \
-        "En Docker, préférez http://app ou http://app_b plutôt que localhost:3000."
+      end
+      "Connexion refusée vers #{target}#{hint}. #{error.message}."
     end
 
     def handle_tofu(public_key)
