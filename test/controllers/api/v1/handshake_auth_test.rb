@@ -38,4 +38,33 @@ class Api::V1::HandshakeAuthTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
     assert_equal "nonce_replayed", JSON.parse(response.body)["error"]
   end
+
+  test "suspended connection returns explicit 403 connection_suspended" do
+    partner = Partner.create!(name: "Test", code: "test_partner")
+    connection = create_partner_connection!(partner: partner, inbound_token: "secret-inbound", status: "suspended")
+
+    headers = signed_headers(connection: connection, method: "GET", path: "/api/v1/products")
+
+    get "/api/v1/products", headers: headers
+    assert_response :forbidden
+    assert_equal "connection_suspended", JSON.parse(response.body)["error"]
+  end
+
+  test "active connection is preferred when an extra non-active one exists" do
+    partner = Partner.create!(name: "Test", code: "test_partner")
+    # Connexion suspendue plus récente, mais une active existe : l'active doit gagner.
+    create_partner_connection!(
+      partner: partner, inbound_token: "old-secret",
+      status: "suspended", remote_url: "http://old.example.com"
+    )
+    active = create_partner_connection!(
+      partner: partner, inbound_token: "secret-inbound",
+      status: "active", remote_url: "http://current.example.com"
+    )
+
+    headers = signed_headers(connection: active, method: "GET", path: "/api/v1/products")
+
+    get "/api/v1/products", headers: headers
+    assert_response :success
+  end
 end

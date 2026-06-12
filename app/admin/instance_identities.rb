@@ -24,6 +24,7 @@ ActiveAdmin.register InstanceIdentity do
   action_item :rotate_identity, only: :index do
     link_to "Régénérer identité instance", rotate_identity_admin_instance_identities_path,
             method: :post,
+            class: "action-item-button",
             data: { confirm: "Les partenaires devront ré-approuver la clé. Continuer ?" }
   end
 

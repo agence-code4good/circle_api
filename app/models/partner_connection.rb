@@ -4,6 +4,7 @@ class PartnerConnection < ApplicationRecord
   STATUSES = %w[pending active suspended key_mismatch].freeze
 
   belongs_to :partner
+  has_many :handshake_nonces, dependent: :delete_all
 
   encrypts :inbound_token
   encrypts :outbound_token

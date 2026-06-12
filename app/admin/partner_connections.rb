@@ -72,11 +72,11 @@ ActiveAdmin.register PartnerConnection do
   end
 
   action_item :fetch_identity, only: :show do
-    link_to "Récupérer clé publique", fetch_identity_admin_partner_connection_path(resource), method: :post
+    link_to "Récupérer clé publique", fetch_identity_admin_partner_connection_path(resource), method: :post, class: "action-item-button"
   end
 
   action_item :run_outbound_challenge, only: :show do
-    link_to "Challenge sortant", outbound_challenge_admin_partner_connection_path(resource), method: :post
+    link_to "Challenge sortant", outbound_challenge_admin_partner_connection_path(resource), method: :post, class: "action-item-button"
   end
 
   action_item :approve_key, only: :show, if: proc { resource.status == "key_mismatch" } do
