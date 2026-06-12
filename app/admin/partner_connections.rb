@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 ActiveAdmin.register PartnerConnection do
-  permit_params :partner_id, :remote_base_url, :linkage_code_local, :linkage_code_remote,
+  permit_params :partner_id, :remote_base_url, :linkage_code_remote,
                 :inbound_token_for_set, :outbound_token_for_set, :status
 
   actions :all
@@ -30,7 +30,6 @@ ActiveAdmin.register PartnerConnection do
       row :id
       row :partner
       row :remote_base_url
-      row :linkage_code_local
       row :linkage_code_remote
       row :status
       row :handshake_version
@@ -56,7 +55,6 @@ ActiveAdmin.register PartnerConnection do
       f.input :partner, collection: Partner.order(:name)
       f.input :remote_base_url,
               hint: "URL de base du partenaire (HTTPS en prod). En Docker : http://app ou http://app_b ; localhost:3000 est réécrit automatiquement."
-      f.input :linkage_code_local, hint: "Code de liaison côté local"
       f.input :linkage_code_remote, hint: "Notre code chez le partenaire (X-Partner-Code sortant)"
       if f.object.new_record? || f.object.inbound_token.blank?
         f.input :inbound_token_for_set, as: :password, label: "Token inbound (généré si vide)",

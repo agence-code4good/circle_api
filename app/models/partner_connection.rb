@@ -73,7 +73,7 @@ class PartnerConnection < ApplicationRecord
   def self.ransackable_attributes(_auth_object = nil)
     %w[
       created_at handshake_version id inbound_challenge_verified_at
-      last_challenge_at last_successful_exchange_at linkage_code_local
+      last_challenge_at last_successful_exchange_at
       linkage_code_remote outbound_challenge_verified_at partner_id
       pinned_public_key_fingerprint remote_base_url status updated_at
     ]

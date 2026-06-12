@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -152,7 +152,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_180000) do
     t.text "inbound_token"
     t.datetime "last_challenge_at"
     t.datetime "last_successful_exchange_at"
-    t.string "linkage_code_local"
     t.string "linkage_code_remote"
     t.datetime "outbound_challenge_verified_at"
     t.text "outbound_token"
