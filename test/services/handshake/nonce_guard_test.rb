@@ -3,43 +3,35 @@
 require "test_helper"
 
 class Handshake::NonceGuardTest < ActiveSupport::TestCase
-  include HandshakeTestHelper
-
   setup do
-    @partner = Partner.create!(name: "Guard", code: "guard")
-    @connection = create_partner_connection!(partner: @partner, inbound_token: "secret")
+    @partner = create_handshake_partner!(code: "guard")
   end
 
   test "consumes a fresh nonce once" do
     nonce = SecureRandom.uuid
-    assert Handshake::NonceGuard.consume(connection: @connection, nonce: nonce, purpose: "request")
+    assert Handshake::NonceGuard.consume(partner: @partner, nonce: nonce, purpose: "request")
   end
 
-  test "rejects a replayed nonce for the same connection" do
+  test "rejects a replayed nonce for the same partner" do
     nonce = SecureRandom.uuid
-    assert Handshake::NonceGuard.consume(connection: @connection, nonce: nonce, purpose: "request")
-    refute Handshake::NonceGuard.consume(connection: @connection, nonce: nonce, purpose: "request")
+    assert Handshake::NonceGuard.consume(partner: @partner, nonce: nonce, purpose: "request")
+    refute Handshake::NonceGuard.consume(partner: @partner, nonce: nonce, purpose: "request")
   end
 
-  test "same nonce is allowed across different connections" do
-    other = create_partner_connection!(
-      partner: @partner,
-      inbound_token: "secret2",
-      remote_url: "http://other.example.com",
-      status: "pending"
-    )
+  test "same nonce is allowed across different partners" do
+    other = create_handshake_partner!(code: "other", remote_url: "http://other.example.com")
     nonce = SecureRandom.uuid
-    assert Handshake::NonceGuard.consume(connection: @connection, nonce: nonce, purpose: "request")
-    assert Handshake::NonceGuard.consume(connection: other, nonce: nonce, purpose: "request")
+    assert Handshake::NonceGuard.consume(partner: @partner, nonce: nonce, purpose: "request")
+    assert Handshake::NonceGuard.consume(partner: other, nonce: nonce, purpose: "request")
   end
 
   test "rejects blank nonce" do
-    refute Handshake::NonceGuard.consume(connection: @connection, nonce: "", purpose: "request")
+    refute Handshake::NonceGuard.consume(partner: @partner, nonce: "", purpose: "request")
   end
 
   test "prune_expired removes only expired rows" do
-    HandshakeNonce.create!(partner_connection: @connection, nonce: "old", purpose: "request", expires_at: 1.hour.ago)
-    HandshakeNonce.create!(partner_connection: @connection, nonce: "fresh", purpose: "request", expires_at: 1.hour.from_now)
+    HandshakeNonce.create!(partner: @partner, nonce: "old", purpose: "request", expires_at: 1.hour.ago)
+    HandshakeNonce.create!(partner: @partner, nonce: "fresh", purpose: "request", expires_at: 1.hour.from_now)
 
     Handshake::NonceGuard.prune_expired
 

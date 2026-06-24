@@ -11,30 +11,30 @@ module Handshake
       end
     end
 
-    def initialize(connection:, nonce:, signature:)
-      @connection = connection
+    def initialize(partner:, nonce:, signature:)
+      @partner = partner
       @nonce = nonce
       @signature = signature
     end
 
     def call
-      raise ChallengeError.new("Connexion suspendue", code: "connection_suspended") if @connection.status == "suspended"
-      raise ChallengeError.new("Clé publique en attente", code: "key_mismatch") if @connection.status == "key_mismatch"
-      raise ChallengeError.new("Clé publique non épinglée", code: "missing_public_key") if @connection.pinned_public_key.blank?
+      raise ChallengeError.new("Connexion suspendue", code: "connection_suspended") if @partner.handshake_status == "suspended"
+      raise ChallengeError.new("Clé publique en attente", code: "key_mismatch") if @partner.handshake_status == "key_mismatch"
+      raise ChallengeError.new("Clé publique non épinglée", code: "missing_public_key") if @partner.pinned_public_key.blank?
       raise ChallengeError.new("Nonce manquant", code: "missing_nonce") if @nonce.blank?
       raise ChallengeError.new("Signature invalide", code: "invalid_signature") unless verify_caller_signature
 
-      unless NonceGuard.consume(connection: @connection, nonce: @nonce, purpose: "challenge")
+      unless NonceGuard.consume(partner: @partner, nonce: @nonce, purpose: "challenge")
         raise ChallengeError.new("Nonce rejoué", code: "nonce_replayed")
       end
 
       response_signature = Signing.sign_nonce(IdentityService.private_key, @nonce)
 
-      @connection.update!(
+      @partner.update!(
         inbound_challenge_verified_at: Time.current,
         last_challenge_at: Time.current
       )
-      @connection.activate_if_ready!
+      @partner.activate_if_ready!
 
       { nonce: @nonce, signature: response_signature }
     end
@@ -42,7 +42,7 @@ module Handshake
     private
 
     def verify_caller_signature
-      Signing.verify_nonce(@connection.pinned_public_key, @nonce, @signature)
+      Signing.verify_nonce(@partner.pinned_public_key, @nonce, @signature)
     end
   end
 end

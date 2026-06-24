@@ -8,15 +8,15 @@ module Handshake
   class ChallengeClient
     class ClientError < StandardError; end
 
-    def initialize(connection)
-      @connection = connection
+    def initialize(partner, outbound_token:)
+      @partner = partner
+      @outbound_token = outbound_token
     end
 
     def call
-      raise ClientError, "Token outbound manquant" if @connection.outbound_token.blank?
-      raise ClientError, "Clé publique partenaire non épinglée" if @connection.pinned_public_key.blank?
+      raise ClientError, "Token outbound manquant" if @outbound_token.blank?
+      raise ClientError, "Clé publique partenaire non épinglée" if @partner.pinned_public_key.blank?
 
-      Handshake::IdentityService.ensure!
       nonce = SecureRandom.uuid
       signature = Signing.sign_nonce(IdentityService.private_key, nonce)
 
@@ -26,11 +26,7 @@ module Handshake
       body = JSON.parse(response.body)
       verify_response!(body)
 
-      @connection.update!(
-        outbound_challenge_verified_at: Time.current,
-        last_challenge_at: Time.current
-      )
-      @connection.activate_if_ready!
+      @partner.record_outbound_challenge!
 
       body
     end
@@ -38,10 +34,10 @@ module Handshake
     private
 
     def post_challenge(nonce, signature)
-      uri = URI.parse("#{OutboundUrl.resolve(@connection.remote_base_url)}/api/challenge")
+      uri = URI.parse("#{OutboundUrl.resolve(@partner.remote_base_url)}/api/challenge")
       request = Net::HTTP::Post.new(uri)
-      request["Authorization"] = "Bearer #{@connection.outbound_token}"
-      request["X-Partner-Code"] = ConnectionResolver.outbound_partner_code(@connection)
+      request["Authorization"] = "Bearer #{@outbound_token}"
+      request["X-Partner-Code"] = ConnectionResolver.outbound_partner_code(@partner)
       request["Content-Type"] = "application/json"
       request.body = { nonce: nonce, signature: signature }.to_json
 
@@ -54,7 +50,7 @@ module Handshake
       nonce = body["nonce"]
       signature = body["signature"]
       raise ClientError, "Réponse challenge invalide" if nonce.blank? || signature.blank?
-      raise ClientError, "Signature réponse invalide" unless Signing.verify_nonce(@connection.pinned_public_key, nonce, signature)
+      raise ClientError, "Signature réponse invalide" unless Signing.verify_nonce(@partner.pinned_public_key, nonce, signature)
     end
   end
 end

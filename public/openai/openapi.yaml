@@ -514,7 +514,7 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
-      description: Token inbound de la relation bilatérale (PartnerConnection)
+      description: Token du partenaire (bcrypt sur Partner) — secret qu'il utilise pour appeler cette instance
 
   schemas:
     # ==================== Validation ====================

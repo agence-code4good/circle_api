@@ -6,8 +6,9 @@ class Api::HandshakeController < ActionController::API
   skip_around_action :log_api_request, only: %i[identity challenge]
 
   def identity
-    Handshake::IdentityService.ensure!
     render json: Handshake::IdentityService.public_payload
+  rescue Handshake::IdentityService::MissingIdentityError
+    render json: { error: "identity_not_configured" }, status: :service_unavailable
   end
 
   def challenge
@@ -18,23 +19,23 @@ class Api::HandshakeController < ActionController::API
       return render json: { error: "unauthorized" }, status: :unauthorized
     end
 
-    connection = Handshake::ConnectionResolver.for_incoming(partner_code: partner_code)
+    partner = Handshake::ConnectionResolver.for_incoming(partner_code: partner_code)
 
-    unless connection&.verify_inbound_token?(token)
+    unless partner&.verify_auth_token?(token)
       return render json: { error: "unauthorized" }, status: :unauthorized
     end
 
     payload = challenge_params
     result = Handshake::Challenge.new(
-      connection: connection,
+      partner: partner,
       nonce: payload[:nonce],
       signature: payload[:signature]
     ).call
 
-    log_handshake_event(connection, "challenge_inbound", success: true)
+    log_handshake_event(partner, "challenge_inbound", success: true)
     render json: result
   rescue Handshake::Challenge::ChallengeError => e
-    log_handshake_event(connection, "challenge_inbound", success: false, error: e.code)
+    log_handshake_event(partner, "challenge_inbound", success: false, error: e.code)
     render json: { error: e.code }, status: challenge_error_status(e.code)
   end
 
@@ -61,13 +62,12 @@ class Api::HandshakeController < ActionController::API
     end
   end
 
-  def log_handshake_event(connection, event, success:, error: nil)
-    return unless connection
+  def log_handshake_event(partner, event, success:, error: nil)
+    return unless partner
 
     ApiLog.create(
       request_id: request.request_id,
-      partner: connection.partner,
-      partner_connection_id: connection.id,
+      partner: partner,
       handshake_event: event,
       http_method: request.method,
       endpoint: request.path,

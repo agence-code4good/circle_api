@@ -14,19 +14,19 @@ module HandshakeAuthenticatable
       return
     end
 
-    @current_connection = Handshake::ConnectionResolver.for_incoming(partner_code: partner_code)
+    @current_partner = Handshake::ConnectionResolver.for_incoming(partner_code: partner_code)
 
-    unless @current_connection
+    unless @current_partner
       render_handshake_error(:unauthorized, "unauthorized")
       return
     end
 
-    unless @current_connection.verify_inbound_token?(token)
+    unless @current_partner.verify_auth_token?(token)
       render_handshake_error(:unauthorized, "unauthorized")
       return
     end
 
-    unless connection_allows_exchange?(@current_connection)
+    unless partner_allows_exchange?(@current_partner)
       return
     end
 
@@ -36,7 +36,7 @@ module HandshakeAuthenticatable
     end
 
     unless Handshake::NonceGuard.consume(
-      connection: @current_connection,
+      partner: @current_partner,
       nonce: request.headers["X-Handshake-Nonce"].to_s,
       purpose: "request"
     )
@@ -44,16 +44,15 @@ module HandshakeAuthenticatable
       return
     end
 
-    @current_partner = @current_connection.partner
-    @current_connection.touch_successful_exchange!
+    @current_partner.touch_successful_exchange!
   end
 
   def bearer_token
     request.headers["Authorization"].to_s.remove("Bearer").strip
   end
 
-  def connection_allows_exchange?(connection)
-    case connection.status
+  def partner_allows_exchange?(partner)
+    case partner.handshake_status
     when "active"
       true
     when "key_mismatch"
@@ -74,13 +73,13 @@ module HandshakeAuthenticatable
     signature = request.headers["X-Handshake-Signature"].to_s
 
     return false if nonce.blank? || timestamp.blank? || signature.blank?
-    return false if @current_connection.pinned_public_key.blank?
+    return false if @current_partner.pinned_public_key.blank?
 
     body = request.body&.read.to_s
     request.body&.rewind
 
     Handshake::Signing.verify_request(
-      public_key_b64: @current_connection.pinned_public_key,
+      public_key_b64: @current_partner.pinned_public_key,
       method: request.method,
       path: request.path,
       body: body,

@@ -3,6 +3,14 @@
 require "test_helper"
 
 class Api::HandshakeControllerTest < ActionDispatch::IntegrationTest
+  test "identity returns service unavailable when not configured" do
+    InstanceIdentity.delete_all
+
+    get "/api/identity"
+    assert_response :service_unavailable
+    assert_equal "identity_not_configured", JSON.parse(response.body)["error"]
+  end
+
   test "identity returns public key" do
     get "/api/identity"
     assert_response :success
@@ -17,18 +25,18 @@ class Api::HandshakeControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
-  test "challenge succeeds with valid inbound token and signature" do
-    partner = Partner.create!(name: "Peer", code: "peer")
+  test "challenge succeeds with valid token and signature" do
     peer_keys = Handshake::Crypto.generate_keypair
     inbound = "inbound-secret-token-value"
 
-    connection = PartnerConnection.create!(
-      partner: partner,
+    partner = Partner.create!(
+      name: "Peer",
+      code: "peer",
       remote_base_url: "http://peer.example.com",
-      inbound_token: inbound,
+      auth_token_for_set: inbound,
       pinned_public_key: peer_keys[:public_key],
       pinned_public_key_fingerprint: Handshake::Crypto.fingerprint(peer_keys[:public_key]),
-      status: "pending"
+      handshake_status: "pending"
     )
 
     nonce = SecureRandom.uuid
@@ -50,22 +58,22 @@ class Api::HandshakeControllerTest < ActionDispatch::IntegrationTest
       body["nonce"],
       body["signature"]
     )
-    connection.reload
-    assert connection.inbound_challenge_verified_at.present?
+    partner.reload
+    assert partner.inbound_challenge_verified_at.present?
   end
 
   test "challenge rejects a replayed nonce" do
-    partner = Partner.create!(name: "Peer", code: "peer")
     peer_keys = Handshake::Crypto.generate_keypair
     inbound = "inbound-secret-token-value"
 
-    PartnerConnection.create!(
-      partner: partner,
+    Partner.create!(
+      name: "Peer",
+      code: "peer",
       remote_base_url: "http://peer.example.com",
-      inbound_token: inbound,
+      auth_token_for_set: inbound,
       pinned_public_key: peer_keys[:public_key],
       pinned_public_key_fingerprint: Handshake::Crypto.fingerprint(peer_keys[:public_key]),
-      status: "pending"
+      handshake_status: "pending"
     )
 
     nonce = SecureRandom.uuid
@@ -80,21 +88,18 @@ class Api::HandshakeControllerTest < ActionDispatch::IntegrationTest
     assert_equal "nonce_replayed", JSON.parse(response.body)["error"]
   end
 
-  # The slimmed controller delegates status handling to Handshake::Challenge.
-  # key_mismatch is resolvable (unlike suspended, which the resolver excludes),
-  # so it exercises the service's 403 path end-to-end.
-  test "challenge on key_mismatch connection returns forbidden" do
-    partner = Partner.create!(name: "Peer", code: "peer")
+  test "challenge on key_mismatch partner returns forbidden" do
     peer_keys = Handshake::Crypto.generate_keypair
     inbound = "inbound-secret-token-value"
 
-    PartnerConnection.create!(
-      partner: partner,
+    Partner.create!(
+      name: "Peer",
+      code: "peer",
       remote_base_url: "http://peer.example.com",
-      inbound_token: inbound,
+      auth_token_for_set: inbound,
       pinned_public_key: peer_keys[:public_key],
       pinned_public_key_fingerprint: Handshake::Crypto.fingerprint(peer_keys[:public_key]),
-      status: "key_mismatch"
+      handshake_status: "key_mismatch"
     )
 
     nonce = SecureRandom.uuid

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_13_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,7 +50,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
     t.string "http_method", null: false
     t.inet "ip_address"
     t.bigint "order_id"
-    t.bigint "partner_connection_id"
     t.bigint "partner_id"
     t.string "path"
     t.text "request_body"
@@ -66,7 +65,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
     t.index ["created_at"], name: "index_api_logs_on_created_at"
     t.index ["endpoint", "created_at"], name: "index_api_logs_on_endpoint_and_created_at"
     t.index ["order_id"], name: "index_api_logs_on_order_id"
-    t.index ["partner_connection_id"], name: "index_api_logs_on_partner_connection_id"
     t.index ["partner_id", "created_at"], name: "index_api_logs_on_partner_id_and_created_at"
     t.index ["partner_id"], name: "index_api_logs_on_partner_id"
     t.index ["request_id"], name: "index_api_logs_on_request_id"
@@ -95,12 +93,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
     t.datetime "created_at", null: false
     t.datetime "expires_at", null: false
     t.string "nonce", null: false
-    t.bigint "partner_connection_id", null: false
+    t.bigint "partner_id", null: false
     t.string "purpose", null: false
     t.datetime "updated_at", null: false
     t.index ["expires_at"], name: "index_handshake_nonces_on_expires_at"
-    t.index ["partner_connection_id", "nonce"], name: "index_handshake_nonces_on_partner_connection_id_and_nonce", unique: true
-    t.index ["partner_connection_id"], name: "index_handshake_nonces_on_partner_connection_id"
+    t.index ["partner_id", "nonce"], name: "index_handshake_nonces_on_partner_id_and_nonce", unique: true
   end
 
   create_table "instance_identities", force: :cascade do |t|
@@ -145,32 +142,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
     t.index ["partner_id"], name: "index_partner_aliases_on_partner_id"
   end
 
-  create_table "partner_connections", force: :cascade do |t|
+  create_table "partners", force: :cascade do |t|
+    t.string "auth_token_digest"
+    t.string "code"
     t.datetime "created_at", null: false
+    t.string "handshake_status", default: "pending", null: false
     t.integer "handshake_version", default: 2, null: false
     t.datetime "inbound_challenge_verified_at"
-    t.text "inbound_token"
     t.datetime "last_challenge_at"
     t.datetime "last_successful_exchange_at"
     t.string "linkage_code_remote"
+    t.string "name"
     t.datetime "outbound_challenge_verified_at"
-    t.text "outbound_token"
-    t.bigint "partner_id", null: false
     t.string "pinned_public_key"
     t.string "pinned_public_key_fingerprint"
-    t.string "remote_base_url", null: false
-    t.string "status", default: "pending", null: false
+    t.string "remote_base_url"
     t.datetime "updated_at", null: false
-    t.index ["partner_id", "remote_base_url"], name: "index_partner_connections_on_partner_id_and_remote_base_url", unique: true
-    t.index ["partner_id"], name: "index_partner_connections_on_partner_id"
-    t.index ["status"], name: "index_partner_connections_on_status"
-  end
-
-  create_table "partners", force: :cascade do |t|
-    t.string "code"
-    t.datetime "created_at", null: false
-    t.string "name"
-    t.datetime "updated_at", null: false
+    t.index ["handshake_status"], name: "index_partners_on_handshake_status"
   end
 
   create_table "users", force: :cascade do |t|
@@ -191,9 +179,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
   add_foreign_key "api_logs", "orders"
   add_foreign_key "api_logs", "partners"
   add_foreign_key "circle_codes", "circle_products"
-  add_foreign_key "handshake_nonces", "partner_connections", on_delete: :cascade
+  add_foreign_key "handshake_nonces", "partners", on_delete: :cascade
   add_foreign_key "order_lines", "orders"
   add_foreign_key "partner_aliases", "partners"
-  add_foreign_key "partner_connections", "partners"
   add_foreign_key "users", "partners"
 end

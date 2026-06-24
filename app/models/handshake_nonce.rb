@@ -3,7 +3,7 @@
 class HandshakeNonce < ApplicationRecord
   PURPOSES = %w[request challenge].freeze
 
-  belongs_to :partner_connection
+  belongs_to :partner
 
   validates :nonce, presence: true
   validates :purpose, inclusion: { in: PURPOSES }

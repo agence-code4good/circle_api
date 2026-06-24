@@ -7,8 +7,8 @@ module Handshake
   class FetchIdentity
     class FetchError < StandardError; end
 
-    def initialize(connection, approve_rotation: false)
-      @connection = connection
+    def initialize(partner, approve_rotation: false)
+      @partner = partner
       @approve_rotation = approve_rotation
     end
 
@@ -34,7 +34,7 @@ module Handshake
     end
 
     def resolved_remote_base_url
-      OutboundUrl.resolve(@connection.remote_base_url)
+      OutboundUrl.resolve(@partner.remote_base_url)
     end
 
     def http_get(url)
@@ -48,30 +48,30 @@ module Handshake
 
     def connection_refused_message(error)
       target = resolved_remote_base_url
-      stored = @connection.remote_base_url
+      stored = @partner.remote_base_url
       hint = if stored != target
                " (URL utilisée : #{target}, enregistrée : #{stored})"
-      else
+             else
                ""
-      end
+             end
       "Connexion refusée vers #{target}#{hint}. #{error.message}."
     end
 
     def handle_tofu(public_key)
       fingerprint = Crypto.fingerprint(public_key)
 
-      if @connection.pinned_public_key.blank?
-        @connection.pin_public_key!(public_key)
+      if @partner.pinned_public_key.blank?
+        @partner.pin_public_key!(public_key)
         return
       end
 
-      if @connection.pinned_public_key_fingerprint != fingerprint
+      if @partner.pinned_public_key_fingerprint != fingerprint
         if @approve_rotation
-          @connection.pin_public_key!(public_key)
+          @partner.pin_public_key!(public_key)
           return
         end
 
-        @connection.mark_key_mismatch!
+        @partner.mark_key_mismatch!
         raise FetchError, "Clé publique divergente (rotation détectée). Statut: key_mismatch."
       end
     end

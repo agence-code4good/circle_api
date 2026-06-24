@@ -2,32 +2,46 @@
 
 module HandshakeTestHelper
   def setup_handshake_identity!
-    Handshake::IdentityService.ensure!
+    return if Handshake::IdentityService.current.present?
+
+    keypair = Handshake::Crypto.generate_keypair
+    Handshake::IdentityService.import!(
+      public_key: keypair[:public_key],
+      private_key: keypair[:private_key],
+      key_version: 1
+    )
   end
 
-  def create_partner_connection!(partner:, inbound_token:, outbound_token: nil, status: "active", remote_url: "http://localhost:3000")
+  def create_handshake_partner!(
+    code:,
+    name: nil,
+    auth_token: "secret-inbound",
+    handshake_status: "active",
+    remote_url: "http://localhost:3000"
+  )
     peer_keypair = Handshake::Crypto.generate_keypair
-
-    PartnerConnection.create!(
-      partner: partner,
+    partner = Partner.create!(
+      name: name || code,
+      code: code,
       remote_base_url: remote_url,
-      inbound_token: inbound_token,
-      outbound_token: outbound_token || Handshake::TokenGenerator.generate,
+      auth_token_for_set: auth_token,
       pinned_public_key: peer_keypair[:public_key],
       pinned_public_key_fingerprint: Handshake::Crypto.fingerprint(peer_keypair[:public_key]),
-      status: status,
+      handshake_status: handshake_status,
       inbound_challenge_verified_at: Time.current,
       outbound_challenge_verified_at: Time.current
-    ).tap do |conn|
-      conn.define_singleton_method(:peer_private_key) { peer_keypair[:private_key] }
+    )
+    partner.tap do |p|
+      p.define_singleton_method(:peer_private_key) { peer_keypair[:private_key] }
+      p.define_singleton_method(:auth_token_plain) { auth_token }
     end
   end
 
-  def signed_headers(connection:, method:, path:, body: "", partner_code: nil)
+  def signed_headers(partner:, method:, path:, body: "", partner_code: nil)
     nonce = SecureRandom.uuid
     timestamp = Time.now.to_i.to_s
     signature = Handshake::Signing.sign_request(
-      private_key_b64: connection.peer_private_key,
+      private_key_b64: partner.peer_private_key,
       method: method,
       path: path,
       body: body,
@@ -36,8 +50,8 @@ module HandshakeTestHelper
     )
 
     {
-      "Authorization" => "Bearer #{connection.inbound_token}",
-      "X-Partner-Code" => partner_code || connection.partner.code,
+      "Authorization" => "Bearer #{partner.auth_token_plain}",
+      "X-Partner-Code" => partner_code || partner.code,
       "X-Handshake-Nonce" => nonce,
       "X-Handshake-Timestamp" => timestamp,
       "X-Handshake-Signature" => signature

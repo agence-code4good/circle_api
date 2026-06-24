@@ -72,24 +72,30 @@ docker compose up -d
 
 ## Handshake v2 (connexion inter-partenaires)
 
-Chaque déploiement possède une identité Ed25519 (`GET /api/identity`). Les échanges API passent par une **PartnerConnection** (URL distante, tokens inbound/outbound échangés hors-bande, clé publique épinglée TOFU).
+Chaque **Partner** est une CircleAPI distante du réseau. Chaque déploiement expose son identité Ed25519 (`GET /api/identity`). Les appels sortants signés sont faits par **CircUI** (ou le SI intégrateur) ; CircleAPI vérifie les requêtes entrantes.
 
 ### Première installation
 
+À l’installation, **CircUI** (ou le SI intégrateur) génère la paire de clés Ed25519 et l’enregistre dans CircleAPI :
+
 ```bash
-docker compose exec app bin/rails handshake:generate_identity
+PUBLIC_KEY="..." PRIVATE_KEY="..." docker compose exec app bin/rails handshake:import_identity
 ```
 
-Le seed appelle déjà `ensure!` si aucune identité n’existe ; cette tâche sert à forcer une génération ou une rotation (`ROTATE=1`).
+`KEY_VERSION` est optionnel (défaut `1` ; incrémenter pour une rotation). La clé privée ne quitte pas le périmètre de l’intégrateur ; CircleAPI expose uniquement la clé publique via `GET /api/identity`.
 
-### Configurer un partenaire (ActiveAdmin)
+Sans CircUI (dev local uniquement), une identité de test peut être créée avec `bin/rails handshake:generate_identity`.
 
-1. Créer une **Partner connection** : URL HTTPS (ou HTTP en dev) du partenaire, token inbound (généré chez vous) et token outbound (fourni par le partenaire).
-2. **Récupérer clé publique** (fetch TOFU).
-3. **Challenge sortant** ; le partenaire exécute le sien vers votre instance.
-4. Statut **active** lorsque les deux challenges sont validés.
+### Configurer un partenaire (ActiveAdmin → Partners)
 
-Tâche utilitaire si une même URL distante s’applique à plusieurs partenaires en dev :
+1. Créer le partenaire : **URL** de sa CircleAPI + **token** (bcrypt, généré chez vous — à transmettre hors bande au pair).
+2. **Récupérer clé publique** (fetch TOFU) ou la coller manuellement.
+3. CircUI exécute les **challenges** vers le pair et vers votre instance ; en admin : **Challenge émis (Circuit)** après le challenge sortant.
+4. Statut **active** lorsque les deux challenges sont enregistrés.
+
+Le token que le pair utilise pour vous appeler est stocké sur le **Partner** (`auth_token_digest`). Le token pour appeler le pair vit côté **CircUI** (outbound).
+
+Tâche utilitaire pour renseigner une URL sur des partenaires sans URL :
 
 ```bash
 REMOTE_BASE_URL=https://partenaire.example.com docker compose exec app bin/rails handshake:migrate_partners

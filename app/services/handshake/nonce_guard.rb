@@ -4,11 +4,11 @@ module Handshake
   class NonceGuard
     TTL = Signing::TIMESTAMP_TOLERANCE.seconds + 60.seconds
     class << self
-      def consume(connection:, nonce:, purpose:)
-        return false if connection.blank? || nonce.blank?
+      def consume(partner:, nonce:, purpose:)
+        return false if partner.blank? || nonce.blank?
 
         HandshakeNonce.create!(
-          partner_connection: connection,
+          partner: partner,
           nonce: nonce,
           purpose: purpose,
           expires_at: TTL.from_now

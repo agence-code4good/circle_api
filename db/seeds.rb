@@ -1,37 +1,52 @@
 # frozen_string_literal: true
 
-# Dispatch vers un profil d'instance dédié pour les tests handshake à deux instances.
-# SEED_INSTANCE=circle    → db/seeds/instance_circle.rb    (A, port 3000, catalogue)
-# SEED_INSTANCE=code4good → db/seeds/instance_code4good.rb (B, port 3001, pair Circle)
-seed_instance = ENV["SEED_INSTANCE"].to_s.strip
-if seed_instance.present?
-  profile = Rails.root.join("db/seeds/instance_#{seed_instance}.rb")
-  if File.exist?(profile)
-    load profile
-    return
-  else
-    abort "SEED_INSTANCE=#{seed_instance} mais #{profile} introuvable"
-  end
-end
-
 puts "=== Seed Circle API ==="
 
-ApiLog.update_all(order_id: nil, partner_id: nil, partner_connection_id: nil)
+ApiLog.update_all(order_id: nil, partner_id: nil)
 Order.destroy_all
 puts "Commandes supprimées"
 
-identity = Handshake::IdentityService.ensure!
-puts "Identité instance (key_version=#{identity.key_version}) — GET /api/identity"
+if Handshake::IdentityService.current
+  puts "Identité instance (key_version=#{Handshake::IdentityService.current.key_version}) — GET /api/identity"
+elsif ENV["PUBLIC_KEY"].present? && ENV["PRIVATE_KEY"].present?
+  identity = Handshake::IdentityService.import!(
+    public_key: ENV.fetch("PUBLIC_KEY"),
+    private_key: ENV.fetch("PRIVATE_KEY"),
+    key_version: ENV.fetch("KEY_VERSION", "1").to_i
+  )
+  puts "Identité instance importée (key_version=#{identity.key_version})"
+else
+  puts "Identité instance absente — importer via CircUI (handshake:import_identity)"
+end
 
-PartnerConnection.destroy_all
 PartnerAlias.destroy_all
 User.update_all(partner_id: nil)
 Partner.destroy_all
 
-code4good = Partner.create!(name: "Code4Good", code: "code4good")
-circle = Partner.create!(name: "Circle", code: "circle")
-chateau_gazin = Partner.create!(name: "Château Gazin", code: "chateau_gazin")
-la_cave_a_part = Partner.create!(name: "La Cave à Part", code: "la_cave_a_part")
+code4good = Partner.create!(
+  name: "Code4Good",
+  code: "code4good",
+  remote_base_url: "http://localhost:3001",
+  handshake_status: "pending"
+)
+circle = Partner.create!(
+  name: "Circle",
+  code: "circle",
+  remote_base_url: "http://localhost:3000",
+  handshake_status: "pending"
+)
+chateau_gazin = Partner.create!(
+  name: "Château Gazin",
+  code: "chateau_gazin",
+  remote_base_url: "http://chateau-gazin.circle.local",
+  handshake_status: "pending"
+)
+la_cave_a_part = Partner.create!(
+  name: "La Cave à Part",
+  code: "la_cave_a_part",
+  remote_base_url: "http://la-cave-a-part.circle.local",
+  handshake_status: "pending"
+)
 
 User.destroy_all
 user = User.create!(
@@ -57,6 +72,7 @@ PartnerAlias.create!(partner: chateau_gazin, external_id: "ext_code4good", partn
 PartnerAlias.create!(partner: chateau_gazin, external_id: "ext_chateau_gazin", partner_code: "chateau_gazin")
 
 puts "Aliases partenaires créés"
+puts "Tokens générés à la création — voir admin Partners pour les transmettre hors bande"
 
 file_path = Rails.root.join("specs", "examples", "circle_data_example.json")
 if File.exist?(file_path)
@@ -74,5 +90,5 @@ else
   puts "Fichier circle_data_example.json absent — produits ignorés"
 end
 
-puts "Connexions inter-partenaires : à configurer dans ActiveAdmin (Partner connections)"
+puts "Handshake : configurer clés publiques + challenges dans admin Partners"
 puts "=== Fin seed ==="

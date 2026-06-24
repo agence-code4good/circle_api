@@ -7,10 +7,10 @@ module Handshake
     def perform
       NonceGuard.prune_expired
 
-      PartnerConnection.where(status: "active").find_each do |connection|
-        FetchIdentity.new(connection).call
+      Partner.where(handshake_status: "active").find_each do |partner|
+        FetchIdentity.new(partner).call
       rescue FetchIdentity::FetchError => e
-        Rails.logger.warn("[Handshake::Monitor] connection=#{connection.id} #{e.message}")
+        Rails.logger.warn("[Handshake::Monitor] partner=#{partner.id} #{e.message}")
       end
     end
   end

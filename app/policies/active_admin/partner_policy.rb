@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 class ActiveAdmin::PartnerPolicy < ApplicationPolicy
   class Scope < Scope
-    # NOTE: Be explicit about which records you allow access to!
     def resolve
       scope.all
     end
@@ -31,6 +32,18 @@ class ActiveAdmin::PartnerPolicy < ApplicationPolicy
   end
 
   def destroy?
+    user.admin?
+  end
+
+  def fetch_identity?
+    user.admin?
+  end
+
+  def record_outbound_challenge?
+    user.admin?
+  end
+
+  def approve_key?
     user.admin?
   end
 end

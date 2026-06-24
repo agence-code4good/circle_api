@@ -14,8 +14,4 @@ class ActiveAdmin::InstanceIdentityPolicy < ApplicationPolicy
   def show?
     user.admin?
   end
-
-  def rotate_identity?
-    user.admin?
-  end
 end

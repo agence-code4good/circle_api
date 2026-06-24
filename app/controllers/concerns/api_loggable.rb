@@ -33,7 +33,6 @@ module ApiLoggable
     ApiLog.create(
       request_id: request.request_id,
       partner: @current_partner,
-      partner_connection: @current_connection,
       http_method: request.method,
       endpoint: request.path,
       path: request.fullpath,
@@ -57,7 +56,6 @@ module ApiLoggable
     ApiLog.create(
       request_id: request.request_id,
       partner: @current_partner,
-      partner_connection: @current_connection,
       http_method: request.method,
       endpoint: request.path,
       path: request.fullpath,

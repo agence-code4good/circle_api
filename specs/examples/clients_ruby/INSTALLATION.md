@@ -26,7 +26,7 @@ specs/examples/clients_ruby/
 Dans le terminal, depuis la racine du projet :
 
 ```bash
-# Les tokens sont sur PartnerConnection (inbound), plus sur Partner.
+# Les tokens sont sur Partner (bcrypt). Les appels sortants signés passent par Circuit.
 # Après db:seed, voir les tokens affichés dans les logs ou ActiveAdmin.
 ```
 

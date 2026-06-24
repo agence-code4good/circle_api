@@ -15,7 +15,7 @@ module ActiveSupport
 
     setup do
       InstanceIdentity.delete_all
-      PartnerConnection.delete_all
+      HandshakeNonce.delete_all
       setup_handshake_identity!
     end
   end
