@@ -7,11 +7,10 @@ class Partner < ApplicationRecord
   has_many :partner_aliases, dependent: :destroy
   has_many :handshake_nonces, dependent: :delete_all
 
-  attr_accessor :auth_token_for_set, :generated_auth_token, :pinned_public_key_for_set
+  attr_accessor :auth_token_for_set, :pinned_public_key_for_set
 
-  before_validation :apply_auth_token_for_set
+  before_validation :apply_auth_token_for_set, if: -> { auth_token_for_set.present? && auth_token_digest.blank? }
   before_validation :apply_pinned_public_key_for_set
-  before_validation :generate_auth_token_if_needed, on: :create
   before_validation :normalize_remote_base_url
 
   validates :code, presence: true, uniqueness: true
@@ -105,10 +104,7 @@ class Partner < ApplicationRecord
   end
 
   def apply_auth_token_for_set
-    return if auth_token_for_set.blank?
-
     set_auth_token(auth_token_for_set)
-    self.generated_auth_token = auth_token_for_set
   end
 
   def apply_pinned_public_key_for_set
@@ -116,14 +112,6 @@ class Partner < ApplicationRecord
 
     self.pinned_public_key = pinned_public_key_for_set
     self.pinned_public_key_fingerprint = Handshake::Crypto.fingerprint(pinned_public_key_for_set)
-  end
-
-  def generate_auth_token_if_needed
-    return if auth_token_digest.present? || auth_token_for_set.present?
-
-    token = Handshake::TokenGenerator.generate
-    self.auth_token_for_set = token
-    self.generated_auth_token = token
   end
 
   def normalize_remote_base_url

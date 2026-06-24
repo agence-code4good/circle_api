@@ -17,6 +17,9 @@ ActiveAdmin.register Partner do
     id_column
     column :name
     column :code
+    column "Token" do |partner|
+      partner.auth_token_digest.present? ? "Défini" : "Non défini"
+    end
     column :remote_base_url
     column :handshake_status
     column :pinned_public_key_fingerprint do |p|
@@ -31,6 +34,9 @@ ActiveAdmin.register Partner do
       row :id
       row :name
       row :code
+      row "Token" do |partner|
+        partner.auth_token_digest.present? ? "Défini à la création (non affiché)" : "Non défini"
+      end
       row :remote_base_url
       row :linkage_code_remote
       row :handshake_status
@@ -42,12 +48,6 @@ ActiveAdmin.register Partner do
       row :last_successful_exchange_at
       row :created_at
       row :updated_at
-    end
-
-    if resource.generated_auth_token.present?
-      div class: "flash flash_warning" do
-        para "Token (affiché une seule fois) : #{resource.generated_auth_token}"
-      end
     end
 
     panel "Aliases pour ce partenaire (en tant qu'émetteur)" do
@@ -71,18 +71,22 @@ ActiveAdmin.register Partner do
 
   form do |f|
     f.semantic_errors(*f.object.errors.attribute_names)
-    f.inputs "Partenaire réseau" do
+    f.inputs "Partenaire" do
       f.input :name
       f.input :code
-      f.input :remote_base_url,
-              hint: "URL de base de la CircleAPI distante (HTTPS en prod)."
-      f.input :linkage_code_remote, hint: "Notre code chez ce partenaire (X-Partner-Code sortant depuis Circuit)"
       if f.object.new_record? || f.object.auth_token_digest.blank?
-        f.input :auth_token_for_set, as: :password, label: "Token (généré si vide, à transmettre au pair)",
+        f.input :auth_token_for_set,
+                as: :password,
+                label: "Token (saisi une seule fois, non ré-affiché)",
                 input_html: { autocomplete: "new-password" }
       else
-        para "Token déjà défini (bcrypt)."
+        para "Un token est déjà défini pour ce partenaire. Il n'est pas affiché et ne peut pas être modifié depuis l'interface."
       end
+    end
+    f.inputs "Handshake" do
+      f.input :remote_base_url,
+              hint: "URL de base de la CircleAPI distante (HTTPS en prod)."
+      f.input :linkage_code_remote, hint: "Notre code chez ce partenaire (X-Partner-Code sortant depuis CircUI)"
       f.input :pinned_public_key_for_set, as: :text, label: "Clé publique (base64, optionnel)",
               hint: "Ou utiliser « Récupérer clé publique » après création."
       f.input :handshake_status, as: :select, collection: Partner::HANDSHAKE_STATUSES, include_blank: false
@@ -95,9 +99,9 @@ ActiveAdmin.register Partner do
   end
 
   action_item :record_outbound_challenge, only: :show do
-    link_to "Challenge émis (Circuit)", record_outbound_challenge_admin_partner_path(resource), method: :post,
+    link_to "Challenge émis (CircUI)", record_outbound_challenge_admin_partner_path(resource), method: :post,
             class: "action-item-button",
-            data: { confirm: "Marquer le challenge sortant comme réussi (fait par Circuit) ?" }
+            data: { confirm: "Marquer le challenge sortant comme réussi (fait par CircUI) ?" }
   end
 
   action_item :approve_key, only: :show, if: proc { resource.handshake_status == "key_mismatch" } do
@@ -116,7 +120,7 @@ ActiveAdmin.register Partner do
 
   member_action :record_outbound_challenge, method: :post do
     resource.record_outbound_challenge!
-    redirect_to admin_partner_path(resource), notice: "Challenge sortant enregistré (Circuit)"
+    redirect_to admin_partner_path(resource), notice: "Challenge sortant enregistré (CircUI)"
   end
 
   member_action :approve_key, method: :post do
@@ -126,17 +130,5 @@ ActiveAdmin.register Partner do
                 notice: "Clé ré-approuvée. Relancer les challenges. (#{result[:key_version]})"
   rescue Handshake::FetchIdentity::FetchError => e
     redirect_to admin_partner_path(resource), alert: e.message
-  end
-
-  controller do
-    def create
-      build_resource
-      if resource.save
-        token_msg = resource.generated_auth_token ? " Token : #{resource.generated_auth_token}" : ""
-        redirect_to admin_partner_path(resource), notice: "Partenaire créé.#{token_msg}"
-      else
-        render :new
-      end
-    end
   end
 end

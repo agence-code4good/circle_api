@@ -72,7 +72,7 @@ PartnerAlias.create!(partner: chateau_gazin, external_id: "ext_code4good", partn
 PartnerAlias.create!(partner: chateau_gazin, external_id: "ext_chateau_gazin", partner_code: "chateau_gazin")
 
 puts "Aliases partenaires créés"
-puts "Tokens générés à la création — voir admin Partners pour les transmettre hors bande"
+puts "Tokens : à saisir dans admin Partners (colonne Token → Non défini)"
 
 file_path = Rails.root.join("specs", "examples", "circle_data_example.json")
 if File.exist?(file_path)

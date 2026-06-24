@@ -29,9 +29,8 @@ namespace :handshake do
 
     Partner.where(remote_base_url: [ nil, "" ]).find_each do |partner|
       partner.update!(remote_base_url: remote_url, handshake_status: "pending")
-      token = partner.generated_auth_token
       puts "Partner #{partner.code}: URL=#{remote_url}"
-      puts "  token (one-time): #{token}" if token.present?
+      puts "  token: #{partner.auth_token_digest.present? ? 'défini' : 'non défini — à saisir dans admin Partners'}"
     end
   end
 end
