@@ -57,4 +57,16 @@ module HandshakeTestHelper
       "X-Handshake-Signature" => signature
     }
   end
+
+  def stub_remote_identity_fetch(result)
+    original = Handshake::RemoteIdentity.method(:fetch)
+    Handshake::RemoteIdentity.define_singleton_method(:fetch) do |_partner|
+      raise result if result.is_a?(Handshake::RemoteIdentity::FetchError)
+
+      result
+    end
+    yield
+  ensure
+    Handshake::RemoteIdentity.define_singleton_method(:fetch, original)
+  end
 end

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "net/http"
-require "json"
-
 module Handshake
   class FetchIdentity
     class FetchError < StandardError; end
@@ -13,49 +10,14 @@ module Handshake
     end
 
     def call
-      url = identity_url
-      response = http_get(url)
-      raise FetchError, "HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
-
-      payload = JSON.parse(response.body)
-      public_key = payload["public_key"]
-      raise FetchError, "public_key manquante" if public_key.blank?
-
-      handle_tofu(public_key)
-      { public_key: public_key, key_version: payload["key_version"], algorithm: payload["algorithm"] }
-    rescue JSON::ParserError => e
-      raise FetchError, "Réponse JSON invalide: #{e.message}"
+      payload = RemoteIdentity.fetch(@partner)
+      handle_tofu(payload[:public_key])
+      payload
+    rescue RemoteIdentity::FetchError => e
+      raise FetchError, e.message
     end
 
     private
-
-    def identity_url
-      "#{resolved_remote_base_url}/api/identity"
-    end
-
-    def resolved_remote_base_url
-      OutboundUrl.resolve(@partner.remote_base_url)
-    end
-
-    def http_get(url)
-      uri = URI.parse(url)
-      Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 10, read_timeout: 10) do |http|
-        http.get(uri.request_uri, { "Accept" => "application/json" })
-      end
-    rescue Errno::ECONNREFUSED, SocketError => e
-      raise FetchError, connection_refused_message(e)
-    end
-
-    def connection_refused_message(error)
-      target = resolved_remote_base_url
-      stored = @partner.remote_base_url
-      hint = if stored != target
-               " (URL utilisée : #{target}, enregistrée : #{stored})"
-             else
-               ""
-             end
-      "Connexion refusée vers #{target}#{hint}. #{error.message}."
-    end
 
     def handle_tofu(public_key)
       fingerprint = Crypto.fingerprint(public_key)
@@ -65,15 +27,15 @@ module Handshake
         return
       end
 
-      if @partner.pinned_public_key_fingerprint != fingerprint
-        if @approve_rotation
-          @partner.pin_public_key!(public_key)
-          return
-        end
+      return if @partner.pinned_public_key_fingerprint == fingerprint
 
-        @partner.mark_key_mismatch!
-        raise FetchError, "Clé publique divergente (rotation détectée). Statut: key_mismatch."
+      if @approve_rotation
+        @partner.pin_public_key!(public_key)
+        return
       end
+
+      @partner.mark_key_mismatch!
+      raise FetchError, "Clé publique divergente (rotation détectée). Statut: key_mismatch."
     end
   end
 end

@@ -31,7 +31,11 @@ module HandshakeAuthenticatable
     end
 
     unless verify_request_signature!
-      render_handshake_error(:unauthorized, "invalid_signature")
+      if Handshake::RotationDetector.call(@current_partner)
+        render_handshake_error(:forbidden, "key_mismatch")
+      else
+        render_handshake_error(:unauthorized, "invalid_signature")
+      end
       return
     end
 

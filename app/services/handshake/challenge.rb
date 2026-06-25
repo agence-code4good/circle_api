@@ -42,7 +42,13 @@ module Handshake
     private
 
     def verify_caller_signature
-      Signing.verify_nonce(@partner.pinned_public_key, @nonce, @signature)
+      return true if Signing.verify_nonce(@partner.pinned_public_key, @nonce, @signature)
+
+      if RotationDetector.call(@partner)
+        raise ChallengeError.new("Rotation de clé détectée", code: "key_mismatch")
+      end
+
+      false
     end
   end
 end
