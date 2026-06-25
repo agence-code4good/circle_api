@@ -103,7 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_16_120000) do
   create_table "instance_identities", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "key_version", default: 1, null: false
-    t.text "private_key"
+    t.text "private_key", null: false
     t.string "public_key", null: false
     t.datetime "rotated_at"
     t.datetime "updated_at", null: false
@@ -151,6 +151,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_16_120000) do
     t.datetime "inbound_challenge_verified_at"
     t.datetime "last_challenge_at"
     t.datetime "last_successful_exchange_at"
+    t.string "linkage_code_remote"
     t.string "name"
     t.string "pinned_public_key"
     t.string "pinned_public_key_fingerprint"

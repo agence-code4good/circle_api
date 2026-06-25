@@ -37,6 +37,7 @@ services:
       - RAILS_ENV=development
       - HANDSHAKE_INSTANCE_CODE=circle
       - HANDSHAKE_IDENTITY_IMPORT_TOKEN=${HANDSHAKE_IDENTITY_IMPORT_TOKEN:-dev-identity-import-token}
+      - HANDSHAKE_OUTBOUND_URL_3001=http://app_b
       # Logs
       - RAILS_LOG_LEVEL=${RAILS_LOG_LEVEL:-debug}
       # Éditeur pour rails credentials:edit
