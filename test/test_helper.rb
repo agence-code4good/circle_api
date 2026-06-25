@@ -16,6 +16,7 @@ module ActiveSupport
     setup do
       InstanceIdentity.delete_all
       HandshakeNonce.delete_all
+      Rails.application.config.handshake_identity_import_token = "test-import-token"
       setup_handshake_identity!
     end
   end

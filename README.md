@@ -76,13 +76,21 @@ Chaque **Partner** est une CircleAPI distante du réseau. Chaque déploiement ex
 
 ### Première installation
 
-À l’installation, **CircUI** (ou le SI intégrateur) génère la paire de clés Ed25519 et l’enregistre dans CircleAPI :
+À l’installation, **CircUI** (ou le SI intégrateur) génère la paire de clés Ed25519 et l’enregistre dans CircleAPI via :
 
-```bash
-PUBLIC_KEY="..." PRIVATE_KEY="..." docker compose exec app bin/rails handshake:import_identity
+```http
+POST /api/admin/identity
+Authorization: Bearer <HANDSHAKE_IDENTITY_IMPORT_TOKEN>
+Content-Type: application/json
+
+{
+  "public_key": "base64...",
+  "private_key": "base64...",
+  "key_version": 1
+}
 ```
 
-`KEY_VERSION` est optionnel (défaut `1` ; incrémenter pour une rotation). La clé privée ne quitte pas le périmètre de l’intégrateur ; CircleAPI expose uniquement la clé publique via `GET /api/identity`.
+`key_version` est optionnel (défaut `1` ; incrémenter pour une rotation). La clé privée ne quitte pas le périmètre de l’intégrateur ; CircleAPI expose uniquement la clé publique via `GET /api/identity`.
 
 Sans CircUI (dev local uniquement), une identité de test peut être créée avec `bin/rails handshake:generate_identity`.
 
@@ -111,6 +119,7 @@ REMOTE_BASE_URL=https://partenaire.example.com docker compose exec app bin/rails
 | Variable | Description |
 |----------|-------------|
 | `HANDSHAKE_INSTANCE_CODE` | Code de cette instance chez les partenaires (défaut : `circle`) |
+| `HANDSHAKE_IDENTITY_IMPORT_TOKEN` | Bearer token pour `POST /api/admin/identity` (CircUI) |
 | `HANDSHAKE_OUTBOUND_REWRITE` | Réécriture des URL `localhost` pour appels sortants depuis Docker (`true` / `false`) |
 | `HANDSHAKE_OUTBOUND_URL_3000` | Cible de réécriture pour `localhost:3000` (ex. URL publique de l’instance) |
 

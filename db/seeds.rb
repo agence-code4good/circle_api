@@ -8,15 +8,8 @@ puts "Commandes supprimées"
 
 if Handshake::IdentityService.current
   puts "Identité instance (key_version=#{Handshake::IdentityService.current.key_version}) — GET /api/identity"
-elsif ENV["PUBLIC_KEY"].present? && ENV["PRIVATE_KEY"].present?
-  identity = Handshake::IdentityService.import!(
-    public_key: ENV.fetch("PUBLIC_KEY"),
-    private_key: ENV.fetch("PRIVATE_KEY"),
-    key_version: ENV.fetch("KEY_VERSION", "1").to_i
-  )
-  puts "Identité instance importée (key_version=#{identity.key_version})"
 else
-  puts "Identité instance absente — importer via CircUI (handshake:import_identity)"
+  puts "Identité instance absente — importer via CircUI (POST /api/admin/identity)"
 end
 
 PartnerAlias.destroy_all

@@ -13,6 +13,7 @@ info:
     Endpoints handshake :
     - `GET /api/identity` — clé publique de l'instance (sans auth)
     - `POST /api/challenge` — validation bilatérale de la configuration
+    - `POST /api/admin/identity` — import de l'identité instance par CircUI (Bearer `HANDSHAKE_IDENTITY_IMPORT_TOKEN`)
     
     ## Concepts clés
     - **Circle Codes** : Ensemble de codes (C0, C1, C2, etc.) décrivant un produit vin
@@ -102,6 +103,56 @@ paths:
           description: Non autorisé
         '403':
           description: Connexion suspendue ou key_mismatch
+
+  /api/admin/identity:
+    post:
+      tags:
+        - Handshake
+      summary: Importer l'identité Ed25519 de l'instance (CircUI)
+      description: |
+        Setup initial ou rotation de clé. Nécessite `HANDSHAKE_IDENTITY_IMPORT_TOKEN`.
+        Pour une rotation, `key_version` doit être supérieur à la version courante.
+      security:
+        - IdentityImportAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - public_key
+                - private_key
+              properties:
+                public_key:
+                  type: string
+                  description: Clé publique Ed25519 (base64)
+                private_key:
+                  type: string
+                  description: Clé privée Ed25519 (base64, stockée chiffrée)
+                key_version:
+                  type: integer
+                  default: 1
+      responses:
+        '201':
+          description: Identité importée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  algorithm:
+                    type: string
+                  public_key:
+                    type: string
+                  key_version:
+                    type: integer
+        '401':
+          description: Token invalide
+        '422':
+          description: Paire de clés invalide ou key_version incorrect
+        '503':
+          description: HANDSHAKE_IDENTITY_IMPORT_TOKEN non configuré
 
   /api/v1/validation:
     post:
@@ -515,6 +566,10 @@ components:
       type: http
       scheme: bearer
       description: Token du partenaire (bcrypt sur Partner) — secret qu'il utilise pour appeler cette instance
+    IdentityImportAuth:
+      type: http
+      scheme: bearer
+      description: HANDSHAKE_IDENTITY_IMPORT_TOKEN — import identité instance par CircUI (POST /api/admin/identity)
 
   schemas:
     # ==================== Validation ====================

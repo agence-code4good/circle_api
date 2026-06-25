@@ -11,7 +11,7 @@ ActiveAdmin.register InstanceIdentity do
   filter :created_at
 
   index do
-    para "L'identité Ed25519 est fournie par CircUI (ou le SI intégrateur) à l'installation via handshake:import_identity.",
+    para "L'identité Ed25519 est fournie par CircUI via POST /api/admin/identity.",
          style: "margin-bottom: 1em; color: #666;"
     column :id
     column :key_version

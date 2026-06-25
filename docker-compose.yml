@@ -36,6 +36,7 @@ services:
       - DATABASE_URL=postgres://circle_api:${DB_PASSWORD:-circle_api_password}@db:5432/circle_api_development
       - RAILS_ENV=development
       - HANDSHAKE_INSTANCE_CODE=circle
+      - HANDSHAKE_IDENTITY_IMPORT_TOKEN=${HANDSHAKE_IDENTITY_IMPORT_TOKEN:-dev-identity-import-token}
       # Logs
       - RAILS_LOG_LEVEL=${RAILS_LOG_LEVEL:-debug}
       # Éditeur pour rails credentials:edit
