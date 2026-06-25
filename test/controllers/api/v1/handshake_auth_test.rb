@@ -16,8 +16,7 @@ class Api::V1::HandshakeAuthTest < ActionDispatch::IntegrationTest
       pinned_public_key: old_key[:public_key],
       pinned_public_key_fingerprint: Handshake::Crypto.fingerprint(old_key[:public_key]),
       handshake_status: "active",
-      inbound_challenge_verified_at: Time.current,
-      outbound_challenge_verified_at: Time.current
+      inbound_challenge_verified_at: Time.current
     )
 
     body = ""

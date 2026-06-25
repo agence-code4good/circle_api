@@ -3,28 +3,28 @@ info:
   title: Circle API
   description: |
     API pour la gestion et la validation des données Circle (codes produits vins).
-    
+
     ## Authentification (Handshake v2)
     Toutes les requêtes API métier nécessitent :
     - `Authorization: Bearer <inbound_token>` — secret de la relation bilatérale
     - `X-Partner-Code` — code du partenaire émetteur
     - `X-Handshake-Nonce`, `X-Handshake-Timestamp`, `X-Handshake-Signature` — signature Ed25519 (voir `specs/handshake_v2_signing.md`)
-    
+
     Endpoints handshake :
     - `GET /api/identity` — clé publique de l'instance (sans auth)
     - `POST /api/challenge` — validation bilatérale de la configuration
     - `POST /api/admin/identity` — import de l'identité instance par CircUI (Bearer `HANDSHAKE_IDENTITY_IMPORT_TOKEN`)
-    
+
     ## Concepts clés
     - **Circle Codes** : Ensemble de codes (C0, C1, C2, etc.) décrivant un produit vin
     - **Circle Key (CLE)** : Clé de contrôle calculée à partir des circle codes
     - **Order** : Commande passée entre un acheteur et un vendeur
     - **Order Lines** : Lignes de commande contenant les circle codes
-    
+
   version: 1.0.0
   contact:
     name: Code4Good
-    
+
 servers:
   - url: http://localhost:3000
     description: Serveur de développement
@@ -54,7 +54,7 @@ paths:
       summary: Clé publique de l'instance
       security: []
       responses:
-        '200':
+        "200":
           description: Identité Ed25519
           content:
             application/json:
@@ -97,11 +97,11 @@ paths:
                 signature:
                   type: string
       responses:
-        '200':
+        "200":
           description: Nonce signé par l'instance réceptrice
-        '401':
+        "401":
           description: Non autorisé
-        '403':
+        "403":
           description: Connexion suspendue ou key_mismatch
 
   /api/admin/identity:
@@ -134,7 +134,7 @@ paths:
                   type: integer
                   default: 1
       responses:
-        '201':
+        "201":
           description: Identité importée
           content:
             application/json:
@@ -147,11 +147,11 @@ paths:
                     type: string
                   key_version:
                     type: integer
-        '401':
+        "401":
           description: Token invalide
-        '422':
+        "422":
           description: Paire de clés invalide ou key_version incorrect
-        '503':
+        "503":
           description: HANDSHAKE_IDENTITY_IMPORT_TOKEN non configuré
 
   /api/v1/validation:
@@ -163,7 +163,7 @@ paths:
         Valide un ensemble de circle codes et retourne :
         - La clé Circle calculée (CLE) si tous les codes sont valides
         - La liste des codes en erreur avec les détails si validation échouée
-        
+
         ⚠️ Cette validation est "à blanc" (sans commande associée)
       operationId: validateCircleCodes
       requestBody:
@@ -190,14 +190,14 @@ paths:
               required:
                 - circle_values
       responses:
-        '200':
+        "200":
           description: Validation effectuée (succès ou échec)
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/ValidationSuccess'
-                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: "#/components/schemas/ValidationSuccess"
+                  - $ref: "#/components/schemas/ValidationError"
               examples:
                 success:
                   summary: Validation réussie
@@ -226,10 +226,10 @@ paths:
                         valid: false
                         errors:
                           - "La valeur '99' de C0 n'existe pas en base."
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/orders:
     post:
@@ -238,7 +238,7 @@ paths:
       summary: Créer une commande
       description: |
         Crée une nouvelle commande avec le statut 'nouvelle_commande'.
-        
+
         ## Règles importantes
         - Seul l'acheteur (buyer) peut créer une commande
         - Le statut doit être 'nouvelle_commande'
@@ -253,7 +253,7 @@ paths:
               type: object
               properties:
                 order:
-                  $ref: '#/components/schemas/OrderInput'
+                  $ref: "#/components/schemas/OrderInput"
             example:
               order:
                 order_reference: "ORD-2026-001"
@@ -272,7 +272,7 @@ paths:
                       C10: "5238A0"
                       C11: "2017"
       responses:
-        '201':
+        "201":
           description: Commande créée avec succès
           content:
             application/json:
@@ -280,21 +280,21 @@ paths:
                 type: object
                 properties:
                   order:
-                    $ref: '#/components/schemas/Order'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
+                    $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
           description: Accès interdit (vous devez être l'acheteur)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               example:
                 error: "Forbidden : You must be the buyer to create an order"
-        '422':
-          $ref: '#/components/responses/ValidationError'
+        "422":
+          $ref: "#/components/responses/ValidationError"
 
   /api/v1/orders/{order_reference}:
     patch:
@@ -303,13 +303,13 @@ paths:
       summary: Mettre à jour une commande
       description: |
         Met à jour une commande existante.
-        
+
         ## Règles importantes
         - L'acheteur et le vendeur peuvent mettre à jour selon les statuts
         - Les transitions de statuts sont contrôlées (voir ALLOWED_TRANSITIONS)
         - Le volume total des order_lines ne peut pas changer après création
         - La order_reference ne peut pas être modifiée
-        
+
         ## Modification des order_lines
         - Possible seulement dans certains statuts
         - Les order_lines sont remplacées complètement (pas de mise à jour partielle)
@@ -331,7 +331,7 @@ paths:
               type: object
               properties:
                 order:
-                  $ref: '#/components/schemas/OrderUpdate'
+                  $ref: "#/components/schemas/OrderUpdate"
             examples:
               updateStatus:
                 summary: Changer le statut
@@ -352,7 +352,7 @@ paths:
                           C10: "5238A0"
                           C11: "2017"
       responses:
-        '200':
+        "200":
           description: Commande mise à jour
           content:
             application/json:
@@ -360,17 +360,17 @@ paths:
                 type: object
                 properties:
                   order:
-                    $ref: '#/components/schemas/Order'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
+                    $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
           description: Action interdite (statut non autorisé, modification order_lines impossible, etc.)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               examples:
                 statusNotAllowed:
                   value:
@@ -378,14 +378,14 @@ paths:
                 orderLinesLocked:
                   value:
                     error: "Forbidden : Les order_lines ne peuvent pas être modifiées pour ce statut"
-        '404':
+        "404":
           description: Commande non trouvée
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '422':
-          $ref: '#/components/responses/ValidationError'
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
 
   /api/v1/products:
     get:
@@ -394,20 +394,20 @@ paths:
       summary: Lister tous les produits
       description: |
         Retourne la liste complète des produits du catalogue Circle.
-        
+
         Le catalogue contient ~9500 produits avec toutes leurs caractéristiques.
       operationId: listProducts
       responses:
-        '200':
+        "200":
           description: Liste des produits
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                  $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/products/{c10}:
     get:
@@ -426,7 +426,7 @@ paths:
             type: string
           example: "5238A0"
       responses:
-        '200':
+        "200":
           description: Détails du produit
           content:
             application/json:
@@ -434,10 +434,10 @@ paths:
                 type: object
                 properties:
                   product:
-                    $ref: '#/components/schemas/Product'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
+                    $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
           description: Produit non trouvé (retourne un produit avec des valeurs nulles)
           content:
             application/json:
@@ -455,18 +455,18 @@ paths:
       summary: Rechercher des circle values
       description: |
         Recherche et retourne des valeurs Circle (codes secondaires) en fonction des valeurs d'entrée (codes principaux).
-        
+
         ## Champs obligatoires
         - `C0` (Version)
         - `CLE` (Clé Circle - doit être valide)
         - `C10` (Code produit)
         - `C11` (Millésime)
-        
+
         ## Dépendances
         Certains codes recherchés nécessitent des champs supplémentaires dans input_values :
         - C6, C7, C8, C9, C39D → nécessitent C1, C2, C3, C4, C5, C13
         - C15-C25, C37C → nécessitent C13
-        
+
         ## Utilisation
         Permet d'enrichir les order_lines d'une commande avec des informations supplémentaires.
       operationId: searchCircleValues
@@ -502,7 +502,7 @@ paths:
                 - input_values
                 - searched_values
       responses:
-        '200':
+        "200":
           description: Valeurs Circle trouvées
           content:
             application/json:
@@ -533,12 +533,12 @@ paths:
                     label: "Volume total bouteilles"
                     value: "330"
                     circle_value: "330"
-        '400':
+        "400":
           description: Requête invalide (champs manquants, clé invalide, dépendances manquantes)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               examples:
                 missingFields:
                   value:
@@ -549,14 +549,14 @@ paths:
                 missingDependencies:
                   value:
                     error: "Le code C6 nécessite les champs suivants dans input_values: C1, C2, C3, C4, C5, C13"
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
           description: Aucune donnée trouvée pour les valeurs d'entrée
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               example:
                 error: "Aucune donnée trouvée pour les valeurs d'entrée"
 
@@ -584,7 +584,7 @@ components:
           type: array
           description: Résultats de validation pour chaque code
           items:
-            $ref: '#/components/schemas/CircleCodeResult'
+            $ref: "#/components/schemas/CircleCodeResult"
 
     ValidationError:
       type: object
@@ -599,7 +599,7 @@ components:
           type: array
           description: Résultats de validation détaillés
           items:
-            $ref: '#/components/schemas/CircleCodeResult'
+            $ref: "#/components/schemas/CircleCodeResult"
 
     CircleCodeResult:
       type: object
@@ -709,7 +709,7 @@ components:
           type: array
           description: Lignes de commande
           items:
-            $ref: '#/components/schemas/OrderLine'
+            $ref: "#/components/schemas/OrderLine"
         created_at:
           type: string
           format: date-time
@@ -773,7 +773,7 @@ components:
           description: Lignes de commande (minimum 1)
           minItems: 1
           items:
-            $ref: '#/components/schemas/OrderLineInput'
+            $ref: "#/components/schemas/OrderLineInput"
 
     OrderUpdate:
       type: object
@@ -802,7 +802,7 @@ components:
           type: array
           description: Nouvelles order_lines (remplace toutes les anciennes)
           items:
-            $ref: '#/components/schemas/OrderLineInput'
+            $ref: "#/components/schemas/OrderLineInput"
 
     OrderLine:
       type: object
@@ -973,11 +973,11 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
 
     ValidationError:
       description: Erreurs de validation
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ValidationErrors'
+            $ref: "#/components/schemas/ValidationErrors"

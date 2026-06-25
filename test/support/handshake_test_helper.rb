@@ -28,8 +28,7 @@ module HandshakeTestHelper
       pinned_public_key: peer_keypair[:public_key],
       pinned_public_key_fingerprint: Handshake::Crypto.fingerprint(peer_keypair[:public_key]),
       handshake_status: handshake_status,
-      inbound_challenge_verified_at: Time.current,
-      outbound_challenge_verified_at: Time.current
+      inbound_challenge_verified_at: Time.current
     )
     partner.tap do |p|
       p.define_singleton_method(:peer_private_key) { peer_keypair[:private_key] }

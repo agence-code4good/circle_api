@@ -39,10 +39,6 @@ class ActiveAdmin::PartnerPolicy < ApplicationPolicy
     user.admin?
   end
 
-  def record_outbound_challenge?
-    user.admin?
-  end
-
   def approve_key?
     user.admin?
   end

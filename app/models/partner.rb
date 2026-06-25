@@ -32,12 +32,12 @@ class Partner < ApplicationRecord
     false
   end
 
-  def mutual_challenge_complete?
-    inbound_challenge_verified_at.present? && outbound_challenge_verified_at.present?
+  def inbound_challenge_verified?
+    inbound_challenge_verified_at.present?
   end
 
   def activate_if_ready!
-    return unless mutual_challenge_complete?
+    return unless inbound_challenge_verified?
     return if pinned_public_key.blank?
 
     update!(handshake_status: "active", last_challenge_at: Time.current)
@@ -60,20 +60,11 @@ class Partner < ApplicationRecord
     }
     if key_changed
       attrs[:inbound_challenge_verified_at] = nil
-      attrs[:outbound_challenge_verified_at] = nil
       attrs[:handshake_status] = "pending"
     elsif handshake_status == "key_mismatch"
       attrs[:handshake_status] = "pending"
     end
     update!(attrs)
-  end
-
-  def record_outbound_challenge!
-    update!(
-      outbound_challenge_verified_at: Time.current,
-      last_challenge_at: Time.current
-    )
-    activate_if_ready!
   end
 
   def touch_successful_exchange!

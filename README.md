@@ -43,6 +43,7 @@ Peuple l’admin, les partenaires, les aliases et le catalogue produits. Les **c
 L'application est accessible sur : **http://localhost:3000**
 
 Voir les logs :
+
 ```bash
 docker compose logs -f app
 ```
@@ -98,8 +99,10 @@ Sans CircUI (dev local uniquement), une identité de test peut être créée ave
 
 1. Créer le partenaire : **URL** de sa CircleAPI + **token** (bcrypt, généré chez vous — à transmettre hors bande au pair).
 2. **Récupérer clé publique** (fetch TOFU) ou la coller manuellement.
-3. CircUI exécute les **challenges** vers le pair et vers votre instance ; en admin : **Challenge émis (Circuit)** après le challenge sortant.
-4. Statut **active** lorsque les deux challenges sont enregistrés.
+3. Le pair exécute le **challenge entrant** vers votre CircleAPI (`POST /api/challenge`).
+4. Statut **active** dès que le challenge entrant est réussi : CircleAPI autorise les requêtes **entrantes** de ce partenaire.
+
+Le challenge **sortant** (CircUI → pair) n’est pas géré par CircleAPI : CircUI l’exécute et contrôle de son côté si les appels sortants sont autorisés.
 
 Le token que le pair utilise pour vous appeler est stocké sur le **Partner** (`auth_token_digest`). Le token pour appeler le pair vit côté **CircUI** (outbound).
 
@@ -116,12 +119,12 @@ REMOTE_BASE_URL=https://partenaire.example.com docker compose exec app bin/rails
 
 ### Variables d'environnement (optionnel)
 
-| Variable | Description |
-|----------|-------------|
-| `HANDSHAKE_INSTANCE_CODE` | Code de cette instance chez les partenaires (défaut : `circle`) |
-| `HANDSHAKE_IDENTITY_IMPORT_TOKEN` | Bearer token pour `POST /api/admin/identity` (CircUI) |
-| `HANDSHAKE_OUTBOUND_REWRITE` | Réécriture des URL `localhost` pour appels sortants depuis Docker (`true` / `false`) |
-| `HANDSHAKE_OUTBOUND_URL_3000` | Cible de réécriture pour `localhost:3000` (ex. URL publique de l’instance) |
+| Variable                          | Description                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------ |
+| `HANDSHAKE_INSTANCE_CODE`         | Code de cette instance chez les partenaires (défaut : `circle`)                      |
+| `HANDSHAKE_IDENTITY_IMPORT_TOKEN` | Bearer token pour `POST /api/admin/identity` (CircUI)                                |
+| `HANDSHAKE_OUTBOUND_REWRITE`      | Réécriture des URL `localhost` pour appels sortants depuis Docker (`true` / `false`) |
+| `HANDSHAKE_OUTBOUND_URL_3000`     | Cible de réécriture pour `localhost:3000` (ex. URL publique de l’instance)           |
 
 En production, renseignez directement l’URL réelle du partenaire dans **remote base URL** plutôt que `localhost`.
 

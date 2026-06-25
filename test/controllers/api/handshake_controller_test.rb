@@ -60,6 +60,7 @@ class Api::HandshakeControllerTest < ActionDispatch::IntegrationTest
     )
     partner.reload
     assert partner.inbound_challenge_verified_at.present?
+    assert_equal "active", partner.handshake_status
   end
 
   test "challenge rejects a replayed nonce" do
@@ -101,8 +102,7 @@ class Api::HandshakeControllerTest < ActionDispatch::IntegrationTest
       pinned_public_key: old_key[:public_key],
       pinned_public_key_fingerprint: Handshake::Crypto.fingerprint(old_key[:public_key]),
       handshake_status: "active",
-      inbound_challenge_verified_at: Time.current,
-      outbound_challenge_verified_at: Time.current
+      inbound_challenge_verified_at: Time.current
     )
 
     nonce = SecureRandom.uuid
