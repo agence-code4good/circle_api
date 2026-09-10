@@ -1,6 +1,6 @@
 ActiveAdmin.register Order do
   permit_params :order_reference, :initial_order_reference,
-  :buyer_id, :seller_id, :note, :status,
+  :buyer_id, :seller_id, :broker_id, :note, :status,
   :accompanying_document_url,
   :latest_instruction_due_date,
   :estimated_availability_earliest_at,
@@ -10,6 +10,7 @@ ActiveAdmin.register Order do
 
   filter :id
   filter :buyer_id
+  filter :broker_id
   filter :created_at
   filter :note
   filter :order_reference
@@ -22,6 +23,7 @@ ActiveAdmin.register Order do
     id_column
     column :order_reference
     column :buyer_id
+    column :broker_id
     column :seller_id
     column :note
     column :status
@@ -34,6 +36,7 @@ ActiveAdmin.register Order do
     attributes_table_for(resource) do
       row :id
       row :buyer_id
+      row :broker_id
       row :created_at
       row :note
       row :order_reference
@@ -60,6 +63,7 @@ ActiveAdmin.register Order do
 
     f.inputs "Commande" do
       f.input :buyer_id,  as: :select, collection: Partner.all.map { |p| [ "#{p.name} (#{p.code})", p.code ] }
+      f.input :broker_id, as: :select, collection: Partner.all.map { |p| [ "#{p.name} (#{p.code})", p.code ] }, include_blank: true
       f.input :seller_id, as: :select, collection: Partner.all.map { |p| [ "#{p.name} (#{p.code})", p.code ] }
       f.input :order_reference
       f.input :note

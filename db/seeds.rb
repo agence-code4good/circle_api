@@ -8,42 +8,53 @@ user = User.create!(admin: true, email: "dev@langagecircle.fr", password: 'Langa
 
 puts "Utilisateur admin créé"
 
-puts "Suppression des commandes..."
+puts "Suppression des logs et commandes..."
 
+ApiLog.destroy_all
 Order.destroy_all
 
-puts "Commandes supprimées"
+puts "Logs et commandes supprimés"
 
 # partners
 
 puts "Création des partenaires..."
 
+BrokerMandate.destroy_all
+PartnerAlias.destroy_all
 Partner.destroy_all
 
-code4good = Partner.create!(name: "Code4Good", code: "code4good", auth_token_for_set: "Code4GoodToken2026!")
-user.update!(partner: code4good)
+buyer_demo = Partner.create!(name: "BuyerDemo", code: "buyer_demo", auth_token_for_set: "BuyerDemoToken2026!")
+user.update!(partner: buyer_demo)
 
-circle = Partner.create!(name: "Circle", code: "circle", auth_token_for_set: "CircleToken2026!")
-chateau_gazin = Partner.create!(name: "Château Gazin", code: "chateau_gazin", auth_token_for_set: "ChateauGazinToken2026!")
-la_cave_a_part = Partner.create!(name: "La Cave à Part", code: "la_cave_a_part", auth_token_for_set: "LaCaveAPartToken2026!")
+seller_demo = Partner.create!(name: "SellerDemo", code: "seller_demo", auth_token_for_set: "SellerDemoToken2026!")
+broker_demo = Partner.create!(name: "BrokerDemo", code: "broker_demo", auth_token_for_set: "BrokerDemoToken2026!")
 
 puts "Partenaires créés avec tokens"
 
 # partner aliases (code4good en tant que partenaire émetteur)
 puts "Création des aliases partenaires..."
 
-PartnerAlias.destroy_all
+PartnerAlias.create!(partner: buyer_demo, external_id: "ext_buyer_demo", partner_code: "buyer_demo")
+PartnerAlias.create!(partner: buyer_demo, external_id: "ext_seller_demo", partner_code: "seller_demo")
 
-PartnerAlias.create!(partner: code4good, external_id: "ext_code4good", partner_code: "code4good")
-PartnerAlias.create!(partner: code4good, external_id: "ext_circle", partner_code: "circle")
-PartnerAlias.create!(partner: code4good, external_id: "ext_chateau_gazin", partner_code: "chateau_gazin")
-PartnerAlias.create!(partner: code4good, external_id: "ext_la_cave_a_part", partner_code: "la_cave_a_part")
+# Aliases quand SellerDemo est l'émetteur (seller)
+PartnerAlias.create!(partner: seller_demo, external_id: "ext_buyer_demo", partner_code: "buyer_demo")
+PartnerAlias.create!(partner: seller_demo, external_id: "ext_seller_demo", partner_code: "seller_demo")
 
-# Aliases quand Château Gazin est l'émetteur (seller)
-PartnerAlias.create!(partner: chateau_gazin, external_id: "ext_code4good", partner_code: "code4good")
-PartnerAlias.create!(partner: chateau_gazin, external_id: "ext_chateau_gazin", partner_code: "chateau_gazin")
+# Aliases quand le Courtier Demo est l'émetteur (broker)
+# Les external_id sont "chez le broker" et sont résolus via PartnerAlias(partner_id = broker_demo.id)
+PartnerAlias.create!(partner: broker_demo, external_id: "ext_broker_demo_buyer", partner_code: "buyer_demo")
+PartnerAlias.create!(partner: broker_demo, external_id: "ext_broker_demo_seller", partner_code: "seller_demo")
 
 puts "Aliases partenaires créés"
+
+# broker mandates (courtier -> buyer)
+puts "Création des mandats courtier..."
+
+BrokerMandate.destroy_all
+BrokerMandate.create!(broker_partner: broker_demo, buyer_partner: buyer_demo, active: true)
+
+puts "Mandats courtier créés"
 
 # circle products
 

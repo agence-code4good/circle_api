@@ -32,13 +32,11 @@ class OrderPolicy < ApplicationPolicy
 
   # Autorisation "générale" d'action
   def create?
-    # Vérifier que le user authentifié est le buyer
-    actor_role == :buyer
+    actor_role == :buyer || broker_as_buyer?
   end
 
   def update?
-    # Vérifier que le user authentifié est le buyer ou le seller
-    actor_role == :buyer || actor_role == :seller
+    actor_role == :buyer || actor_role == :seller || broker_as_buyer?
   end
 
   # Vérifie si les order_lines peuvent être modifiées
@@ -56,7 +54,7 @@ class OrderPolicy < ApplicationPolicy
     end
 
     # Sinon, autoriser si c'est le buyer ou le seller
-    actor_role == :buyer || actor_role == :seller
+    actor_role == :buyer || actor_role == :seller || broker_as_buyer?
   end
 
   # Vérifie que le statut demandé est autorisé pour le rôle de l'utilisateur
@@ -71,7 +69,7 @@ class OrderPolicy < ApplicationPolicy
       # Depuis annulee_acheteur, seul le seller peut confirmer
       return actor_role == :seller if current_status == "annulee_acheteur"
       # Depuis annulee_vendeur, seul le buyer peut confirmer
-      return actor_role == :buyer if current_status == "annulee_vendeur"
+      return (actor_role == :buyer || broker_as_buyer?) if current_status == "annulee_vendeur"
       # Sinon, personne ne peut directement passer à "annulee"
       return false
     end
@@ -81,13 +79,14 @@ class OrderPolicy < ApplicationPolicy
       # Les deux parties peuvent revenir au statut précédent
       if record.previous_status.present?
         previous_status_key = Order.statuses.key(record.previous_status)
-        return true if to_status == previous_status_key && (actor_role == :buyer || actor_role == :seller)
+        return true if to_status == previous_status_key && (actor_role == :buyer || actor_role == :seller || broker_as_buyer?)
       end
     end
 
     # Vérifier que le statut demandé est dans la liste autorisée pour le rôle
     case actor_role
     when :buyer  then BUYER_ONLY.include?(to_status)
+    when :broker then BUYER_ONLY.include?(to_status)
     when :seller then SELLER_ONLY.include?(to_status)
     else false
     end
@@ -99,11 +98,24 @@ class OrderPolicy < ApplicationPolicy
 
     if record.buyer_id == user.code
       :buyer
+    elsif record.broker_id.present? && record.broker_id == user.code
+      :broker
     elsif record.seller_id == user.code
       :seller
     else
       nil
     end
+  end
+
+  private
+
+  # A broker can act as buyer only for orders explicitly brokered
+  # (record.broker_id == user.code) and only if a valid mandate exists.
+  def broker_as_buyer?
+    return false unless user.is_a?(Partner) && record
+    return false unless record.broker_id.present? && record.broker_id == user.code
+
+    BrokerMandate.active_for_codes?(broker_code: user.code, buyer_code: record.buyer_id)
   end
 
   class Scope < ApplicationPolicy::Scope
