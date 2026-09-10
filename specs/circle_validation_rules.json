@@ -1,45 +1,27 @@
 {
   "C0": {
     "name": "Version",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "CLE": {
     "name": "Key",
-    "validations": [
-      { "type": "key_validation" },
-      { "type": "single_value" }
-    ]
+    "validations": [{ "type": "key_validation" }, { "type": "single_value" }]
   },
   "C1": {
     "name": "Case",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C2": {
     "name": "PackingSize",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C3": {
     "name": "CaseCharacteristic",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C4": {
     "name": "CaseOrigin",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C5": {
     "name": "CasePackaging",
@@ -336,9 +318,7 @@
   },
   "C33B": {
     "name": "TraceabilityNumber",
-    "validations": [
-      { "type": "single_value" }
-    ]
+    "validations": [{ "type": "single_value" }]
   },
   "C34": {
     "name": "HarvestDate",
@@ -393,9 +373,7 @@
   },
   "C39D": {
     "name": "CaseBarcodeNumber",
-    "validations": [
-      { "type": "match_other_code_length", "source_code": "C38" }
-    ]
+    "validations": [{ "type": "match_other_code_length", "source_code": "C38" }]
   },
   "C40": {
     "name": "VintageCertificationOrganism",
@@ -443,9 +421,7 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       {
         "type": "dependency",
@@ -535,9 +511,7 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       {
         "type": "dependency",
@@ -621,10 +595,7 @@
   },
   "C51": {
     "name": "PassPresence",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C52E": {
     "name": "SpecificBackLabelBat",
@@ -677,10 +648,7 @@
   },
   "C59": {
     "name": "PalletType",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C60": {
     "name": "PalletVolume",
@@ -705,28 +673,19 @@
   },
   "C63L": {
     "name": "Fda",
-    "validations": [
-      { "type": "single_value" }
-    ]
+    "validations": [{ "type": "single_value" }]
   },
   "C64M": {
     "name": "Gacc",
-    "validations": [
-      { "type": "single_value" }
-    ]
+    "validations": [{ "type": "single_value" }]
   },
   "C65N": {
     "name": "Ttb",
-    "validations": [
-      { "type": "single_value" }
-    ]
+    "validations": [{ "type": "single_value" }]
   },
   "C66": {
     "name": "InBond",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "in_database" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
   "C67O": {
     "name": "ListOfIngredient",
@@ -802,9 +761,15 @@
   "C76": {
     "name": "QrCodeNutriInfo",
     "validations": [
-      { "type": "single_value" },
-      { "type": "casket_value", "match_c2_length": true },
-      { "type": "in_database" }
+      { "type": "in_database" },
+      {
+        "type": "excluded_combinations",
+        "excluded_combinations": [
+          ["00", "/./"],
+          ["A0", "/(00|A2|A3)/"],
+          ["A1", "/(00|A3|A4|A5|A6|A7|A8|A9|B0)/"]
+        ]
+      }
     ]
   },
   "C77P": {
@@ -813,9 +778,7 @@
       { "type": "single_value" },
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       { "type": "match_pattern", "pattern_name": "url_https" }
     ]
@@ -826,9 +789,7 @@
       { "type": "duplicate_value" },
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       { "type": "casket_value", "allowed_values": ["00"] },
       { "type": "in_database", "filter_from_code": "C13" }
@@ -839,9 +800,7 @@
     "validations": [
       {
         "type": "excluded_combinations",
-        "excluded_combinations": [
-          ["00", "/./"]
-        ]
+        "excluded_combinations": [["00", "/./"]]
       },
       {
         "type": "dependency",
@@ -877,9 +836,31 @@
       { "type": "casket_value", "allowed_values": ["00"] },
       {
         "type": "in_database_combination",
-        "combination_codes": ["C1", "C2", "C3", "C4", "C5", "C13", "C14", "C20", "C36", "C38"],
+        "combination_codes": [
+          "C1",
+          "C2",
+          "C3",
+          "C4",
+          "C5",
+          "C13",
+          "C14",
+          "C20",
+          "C36",
+          "C38"
+        ],
         "combinaison_mode": "single_code"
       }
+    ]
+  },
+  "C81Q": {
+    "name": "DOCUrl",
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "excluded_combinations",
+        "excluded_combinations": [["00", "/./"]]
+      },
+      { "type": "match_pattern", "pattern_name": "url_https" }
     ]
   }
 }
