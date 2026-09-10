@@ -705,6 +705,15 @@ C76:
     "A0": "Absence des informations nutritionnelles"
     "A1": "Présence du Tableau des informations nutritionnelles"
     "A2": "Présence du QR Code des informations nutritionnelles"
+    "A3": "Présence du QR Code E-Label (liste des ingrédients)"
+    "A4": "Présence du QR Code Info-tri harmonisé européen"
+    "A5": "Présence d'un QR Code avec les informations de contact du producteur sur le format"
+    "A6": "Présence d'un QR Code avec les informations de contact du producteur sur le conditionnement"
+    "A7": "Présence d'un QR Code avec information marketing et storytelling"
+    "A8": "Présence d'un QR Code d'authetification et anti-contrefaçon"
+    "A9": "Présence d'un QR Code pour les certifications"
+    "B0": "Présence d'un QR code GS1 Digital Link"
+
 C77P:
   label: "qr_code_url"
   type: "string"
@@ -722,6 +731,11 @@ C79:
     "00": "ND"
 C80:
   label: "case_by_default"
+  type: "string"
+  enum:
+    "00": "ND"
+C81Q:
+  label: "d_o_c_url"
   type: "string"
   enum:
     "00": "ND"
