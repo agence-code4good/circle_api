@@ -50,4 +50,3 @@ ActiveAdmin.register BrokerMandate do
     f.actions
   end
 end
-

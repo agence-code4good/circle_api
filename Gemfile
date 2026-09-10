@@ -18,6 +18,9 @@ gem "stimulus-rails"
 gem "cssbundling-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
+# json 3.x drops the two-argument JSON.parse that ActiveSupport still relies on.
+# 2.19.9 carries the security fix; stay on the 2.x line.
+gem "json", "~> 2.19", ">= 2.19.9"
 gem "nokogiri", ">= 1.19.1"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]

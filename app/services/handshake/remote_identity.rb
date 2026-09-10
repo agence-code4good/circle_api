@@ -54,11 +54,7 @@ module Handshake
     def connection_refused_message(error)
       target = resolved_remote_base_url
       stored = @partner.remote_base_url
-      hint = if stored != target
-               " (URL utilisée : #{target}, enregistrée : #{stored})"
-             else
-               ""
-             end
+      hint = stored != target ? " (URL utilisée : #{target}, enregistrée : #{stored})" : ""
       "Connexion refusée vers #{target}#{hint}. #{error.message}."
     end
   end

@@ -4,4 +4,3 @@ class AddBrokerIdToOrders < ActiveRecord::Migration[8.1]
     add_index :orders, :broker_id
   end
 end
-
