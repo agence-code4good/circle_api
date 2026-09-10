@@ -33,4 +33,3 @@ class ActiveAdmin::BrokerMandatePolicy < ApplicationPolicy
     user.admin?
   end
 end
-

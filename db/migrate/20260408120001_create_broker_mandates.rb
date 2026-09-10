@@ -16,4 +16,3 @@ class CreateBrokerMandates < ActiveRecord::Migration[8.1]
     add_index :broker_mandates, :active
   end
 end
-
