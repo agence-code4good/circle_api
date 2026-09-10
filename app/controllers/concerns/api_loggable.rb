@@ -10,9 +10,8 @@ module ApiLoggable
   def log_api_request
     start_time = Time.current
 
-    # Lire le body une seule fois
-    request_body = request.body.read
-    request.body.rewind
+    request_body = request.body&.read.to_s
+    request.body&.rewind
 
     begin
       # Exécuter la requête
@@ -81,7 +80,10 @@ module ApiLoggable
       content_type: request.headers["Content-Type"],
       accept: request.headers["Accept"],
       user_agent: request.headers["User-Agent"],
-      x_partner_code: request.headers["X-Partner-Code"]
+      x_partner_code: request.headers["X-Partner-Code"],
+      x_handshake_nonce: request.headers["X-Handshake-Nonce"],
+      x_handshake_timestamp: request.headers["X-Handshake-Timestamp"],
+      x_handshake_signature: request.headers["X-Handshake-Signature"].present? ? "[REDACTED]" : nil
     }.compact
   end
 

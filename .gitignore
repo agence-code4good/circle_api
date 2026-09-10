@@ -45,3 +45,8 @@ node_modules/
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Développement local : tests handshake deux instances (non nécessaire en prod)
+/script/
+/docker-compose.handshake.yml
+/db/seeds/
+/lib/tasks/seed_instances.rake

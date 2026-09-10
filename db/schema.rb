@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_08_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_16_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,6 +46,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_120001) do
     t.string "endpoint", null: false
     t.text "error_backtrace"
     t.text "error_message"
+    t.string "handshake_event"
     t.string "http_method", null: false
     t.inet "ip_address"
     t.bigint "order_id"
@@ -102,6 +103,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_120001) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "handshake_nonces", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.string "nonce", null: false
+    t.bigint "partner_id", null: false
+    t.string "purpose", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_handshake_nonces_on_expires_at"
+    t.index ["partner_id", "nonce"], name: "index_handshake_nonces_on_partner_id_and_nonce", unique: true
+  end
+
+  create_table "instance_identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "key_version", default: 1, null: false
+    t.text "private_key", null: false
+    t.string "public_key", null: false
+    t.datetime "rotated_at"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "order_lines", force: :cascade do |t|
     t.jsonb "circle_code"
     t.datetime "created_at", null: false
@@ -141,8 +162,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_120001) do
     t.string "auth_token_digest"
     t.string "code"
     t.datetime "created_at", null: false
+    t.string "handshake_status", default: "pending", null: false
+    t.integer "handshake_version", default: 2, null: false
+    t.datetime "inbound_challenge_verified_at"
+    t.datetime "last_challenge_at"
+    t.datetime "last_successful_exchange_at"
+    t.string "linkage_code_remote"
     t.string "name"
+    t.string "pinned_public_key"
+    t.string "pinned_public_key_fingerprint"
+    t.string "remote_base_url"
     t.datetime "updated_at", null: false
+    t.index ["handshake_status"], name: "index_partners_on_handshake_status"
   end
 
   create_table "users", force: :cascade do |t|
@@ -165,6 +196,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_120001) do
   add_foreign_key "broker_mandates", "partners", column: "broker_partner_id"
   add_foreign_key "broker_mandates", "partners", column: "buyer_partner_id"
   add_foreign_key "circle_codes", "circle_products"
+  add_foreign_key "handshake_nonces", "partners", on_delete: :cascade
   add_foreign_key "order_lines", "orders"
   add_foreign_key "partner_aliases", "partners"
   add_foreign_key "users", "partners"

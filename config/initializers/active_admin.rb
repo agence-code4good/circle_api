@@ -4,7 +4,10 @@ ActiveAdmin.setup do |config|
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
-  config.site_title = "Circle Admin"
+  config.site_title = proc do |view|
+    instance_name = view.current_user&.partner&.name
+    instance_name.present? ? "#{instance_name} - Circle API Admin" : "Circle API Admin"
+  end
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.

@@ -506,6 +506,7 @@ DEPENDENCIES
   debug
   devise
   draper
+  ed25519 (~> 1.4)
   image_processing (~> 1.2)
   importmap-rails
   jbuilder

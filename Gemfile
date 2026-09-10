@@ -82,6 +82,9 @@ gem "simple_form"
 gem "rack-attack"
 gem "rack-cors"
 
+# Handshake v2 (Ed25519)
+gem "ed25519", "~> 1.4"
+
 # Admin Panel
 gem "activeadmin", "~> 4.0.0.beta22"
 gem "activeadmin_assets"

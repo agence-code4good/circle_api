@@ -11,6 +11,13 @@ Rails.application.routes.draw do
   get "/api-docs", to: "swagger_ui#index"
 
   namespace :api, defaults: { format: :json } do
+    get "identity", to: "handshake#identity"
+    post "challenge", to: "handshake#challenge"
+
+    namespace :admin do
+      resource :identity, only: :create, controller: "identity"
+    end
+
     namespace :v1 do
       # Validation "à blanc" (sans commande associée)
       post "validation", to: "validations#validate"
